@@ -1,0 +1,112 @@
+\documentclass{article}
+\usepackage{natbib}
+\title{DisperseR: Calculating Seed Dispersal In R}
+\author{Samantha L. Davis}
+\begin{document}
+\maketitle
+\tableofcontents
+\SweaveOpts{concordance=TRUE}
+
+\section{Introduction}
+
+This is a small package intended to help users calculating seed dispersal in R. Although the R base machinery is capable of doing so, this package streamlines the process and enables you to focus more on the important aspects of data analysis instead of data generation or clean-up.
+
+This code operates as follows. Ideally, you'll need a dataframe that contains the following data: (x,y) coordinates of each tree and seedling in a plot; and dbh measurements of any tree large enough. A tree is any individual that can be measured for diameter at breast height, and all trees are assumed to be reproductively active; a seedling is any individual that is new in the calendar year.
+
+Spatial seed dispersal is characterized by a single equation,
+
+\begin{equation}
+\label{eq:dispersal}
+R_i = STR * \sum\limits_{k=1}^T\left( \frac{DBH_k}{30}\right) ^2 e^{-Dm_{ik}^3} * \left( \frac{1}{n}\right)
+\end{equation}
+
+where \textit{n} is a normalizer function that standardizes the equation to values between 0 and 1,
+
+\begin{equation}
+n = \int\limits_{0}^\infty e^{-Dm_{ik}^3} \nonumber
+\end{equation}
+
+and where \textit{STR} is the standardized number of tree recruits, \textit{DBH} is the diameter at breast height, \textit{D} is a species-specific parameter estimated by this equation, and \textit{m} is the distance between the measured point \textit{i} and adult tree \textit{k}, summed over each adult tree (\textit{k}=1 to \textit{T} adult trees). These equations were originally established by \citet{Ribbens1994}, in an experiment where seedling per $m^2$ along a belt transect were correlated to the number and size of any adults within a $20 m$ radius.
+
+The first piece of the equation, containing STR, establishes the number of recruits produced for a tree of a standard DBH (30cm), and the second piece of the equation establishes the mean density of recruits found in a $1 m^2$ quadrat centered at \textit{m} distance away from the parent tree. Finally, $\frac{1}{n}$ serves as a normalizer to standardize the equation across species.
+
+The parameters \textit{STR} and {D} are both needed by SORTIE-ND, an individual tree neighborhood dynamics forest gap model (say that five times fast!), to calculate seed dispersal for target species in its simulations. SORTIE-ND, unfortunately, does not come packaged with a magic bullet that offers species-specific parameters, and therefore, we must parameterize the model ourselves. This package is intended to help create estimates of both \textit{STR} and \textit{D} quickly, so that other parameters may be addressed.
+
+What follows is a list of functions alongside example usage. To start, you must import or generate a plot map of all trees in a given area. This plot map must include a species identifier, an x coordinate, a y coordinate, and DBH (or NA) for each individual.
+
+\section{Generating Plot Map}
+
+\subsection{generatePlotMap}
+We can generate a sample plot easily with generatePlotMap(). As you can see below, this function generates a plot map with NA's for seedlings and actual values of DBH for adult trees. See ?generatePlotMap() for information on how to customize your random plot map.
+<<>>=
+library(disperseR)
+myplot <- generatePlotMap()
+head(myplot)
+tail(myplot)
+@
+
+Now that we have a plotmap, we can focus on creating the spatial dispersal equations. Obviously, since this plot map is random, our end parameters will be useless, but this will at least demonstrate proof-of-concept, and you can apply it to real data later.
+
+If you do have your own data, just make sure that it matches the column names of the plot map generated above, and also the data types. You can check the structure of a dataframe using str() and then as.numeric() or as.character() to adjust as needed. In our case, you need four columns: species, x, y, and DBH. x, y, and DBH should all be numeric. ``species'' can be a character vector or a numeric vector, as long as the species names are unique.
+
+<<>>=
+## exploring the structure of myplot
+str(myplot)
+## if we needed to convert a column
+myplot$species <- as.numeric(myplot$species)
+@
+
+
+\section{Sampling The Plot Map}
+
+Now that we have a plot map ready, we need to be able to sample the plot.  \citet{Ribbens1994} sampled using a belt transect, stopping every so often to count all of the seedlings in a $1 m^2$ plot, and all adult trees within $20m$ of the seedling plot. So, for each seedling plot sampled, we need records of adult trees' DBH and their distance to the seedling subplot, up to 20m away. The end table to plug into the equation might look something like:
+
+<<>>=
+spatialDisperseDf <- data.frame(subplot=rep(1:3,5),
+                                species=1,
+                                numseedlings=rep(c(2,4,6), 5),
+                                DBH=runif(15, 0, 100),
+                                m=runif(15, 0, 20))
+head(spatialDisperseDf)
+@
+
+Of course, the key part of this package is to generate this dataframe and then use it for analysis. There are obviously several ways to sample that are as statstically valid as the belt transect method, and given that we have the benefit of an exhaustive map of a given plot, we should consider using other sampling methods that generate the same sort of information without the linear bias. For ease, this package picks the locations of seedling subplots from your plot randomly, with a buffer around the length and width to prevent trying to find adult trees outside of the plot area.
+
+\subsection{getRandomBufferedPoints}
+
+The first thing we need to do is select our subplots. We can do that with the function getRandomBufferedPoints(), which takes an x and a y vector, a buffer value, and ``n'', representing the number of samples that you need. This function then spits out ``n'' random x and y points within the buffered plot space. These locations can represent your seedling plots.
+
+<<>>=
+subplotLocations <- getRandomBufferedPoints(x=myplot$x,
+                                            y=myplot$y,
+                                            buffer=20,
+                                            n=100)
+head(subplotLocations)
+@
+
+\subsection{sampleSubplots}
+Of course, now that we have our random seedling plots ready, we need to actually see if there are any seedlings inside of our randomly chosen subplot locations. We can use the sampleSubplots() function to do that.
+
+The sampleSubplots function takes your x and y coordinates, builds a box around them, and then subsets your full plot dataframe to see if there are any seedlings present. This function takes our pre-existing subplotLocations and myplot dataframes, and samples appropriately with a subplot size of 25m.
+
+<<>>=
+seedlingDensity <- sampleSubplots(subplotLocations, myplot, subplotsize=25)
+head(seedlingDensity)
+str(seedlingDensity)
+@
+
+Now that we have seedling density in our subplots, we need to figure out how many possible parent trees there are for each of the positive hits. We can do that using the getParentTrees() function.
+
+\subsection{getParentTrees}
+
+The getParentTrees() function works by searching a full plot for trees (where dbh is \textit{not} NA) that fall within $20 m$ of a seedling plot that contains that species. Of course, you can set that $20 m$ buffer to some other value if you'd like.
+
+<<>>=
+getParentTrees(seedlingDensity, myplot)
+@
+
+
+
+\bibliographystyle{sty/ecology}
+\bibliography{disperseRmanual}
+\end{document}

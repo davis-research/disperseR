@@ -16,7 +16,7 @@
 #'
 #'@export
 
-generatePlotMap <- function(species=3, plotlength=100, plotwidth=100, maxsize=100, propSeeds=0.5, maxnum=20){
+generatePlotMap <- function(species=5, plotlength=1000, plotwidth=1000, maxsize=100, propSeeds=0.5, maxnum=150){
   ## figure out how many trees to create. If there's only one number in maxnum,
   ## multiple it by species to get total rows needed
     if(length(maxnum)==1){
