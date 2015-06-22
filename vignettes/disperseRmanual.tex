@@ -46,25 +46,25 @@ We can generate a sample plot easily with generatePlotMap(). As you can see belo
 > head(myplot)
 \end{Sinput}
 \begin{Soutput}
-  species        x          y dbh
-1       1 385.6154 985.785907  NA
-2       1 851.7756 697.200094  NA
-3       1 401.9323   4.610472  NA
-4       1 836.0269 487.991343  NA
-5       1 755.7098 917.864674  NA
-6       1 306.3455 434.971478  NA
+  species        x        y dbh
+1       1 807.4247 507.8046  NA
+2       1 716.7755 250.1089  NA
+3       1 663.9457 754.5766  NA
+4       1 142.9948 374.6370  NA
+5       1 530.3830 221.6209  NA
+6       1 609.4712 460.2917  NA
 \end{Soutput}
 \begin{Sinput}
 > tail(myplot)
 \end{Sinput}
 \begin{Soutput}
-    species         x        y      dbh
-745       5 560.69002 292.8404 24.57768
-746       5 106.19956 908.0030 84.65400
-747       5 518.49203 498.0702 79.69312
-748       5  52.77148 152.2081 37.59841
-749       5  87.16742 837.4155 52.06587
-750       5 943.00556 377.6981 67.90298
+    species        x        y      dbh
+745       5 966.5782 529.7618 48.87171
+746       5 358.1308 784.8376 54.50437
+747       5 187.9779 648.3317 62.67000
+748       5 942.6674 496.2957 29.26230
+749       5 122.2823 142.3175 57.63271
+750       5 533.8458 553.2040 65.55217
 \end{Soutput}
 \end{Schunk}
 
@@ -80,8 +80,8 @@ If you do have your own data, just make sure that it matches the column names of
 \begin{Soutput}
 'data.frame':	750 obs. of  4 variables:
  $ species: int  1 1 1 1 1 1 1 1 1 1 ...
- $ x      : num  386 852 402 836 756 ...
- $ y      : num  985.79 697.2 4.61 487.99 917.86 ...
+ $ x      : num  807 717 664 143 530 ...
+ $ y      : num  508 250 755 375 222 ...
  $ dbh    : num  NA NA NA NA NA NA NA NA NA NA ...
 \end{Soutput}
 \begin{Sinput}
@@ -105,13 +105,13 @@ Now that we have a plot map ready, we need to be able to sample the plot.  \cite
 > head(spatialDisperseDf)
 \end{Sinput}
 \begin{Soutput}
-  subplot species numseedlings       DBH          m
-1       1       1            2 53.979248  9.5207819
-2       2       1            4 20.727423 16.4417057
-3       3       1            6  6.522029  6.0429382
-4       1       1            2 61.213360 10.7982601
-5       2       1            4 30.620536  4.1124465
-6       3       1            6 16.957815  0.4305174
+  subplot species numseedlings      DBH          m
+1       1       1            2 22.60360 10.4383481
+2       2       1            4 89.85045  9.6430821
+3       3       1            6 57.95143  5.4454423
+4       1       1            2 69.76575  3.4763289
+5       2       1            4 91.61190 11.8251530
+6       3       1            6 72.63399  0.9457134
 \end{Soutput}
 \end{Schunk}
 
@@ -119,55 +119,99 @@ Of course, the key part of this package is to generate this dataframe and then u
 
 \subsection{getRandomBufferedPoints}
 
-The first thing we need to do is select our subplots. We can do that with the function getRandomBufferedPoints(), which takes an x and a y vector, a buffer value, and ``n'', representing the number of samples that you need. This function then spits out ``n'' random x and y points within the buffered plot space. These locations can represent your seedling plots.
+The first thing we need to do is select our subplots. We can do that with the function getRandomBufferedPoints(), which takes an x and a y vector, a buffer value, and ``n'', representing the number of samples that you need. This function then spits out ``n'' random x and y points within the buffered plot space. These locations can represent your seedling plots. There are two versions of getBufferedPoints, one with random sampling (default), and one with systematic. Both are featured below.
 
 \begin{Schunk}
 \begin{Sinput}
-> subplotLocations <- getRandomBufferedPoints(x=myplot$x,
-+                                             y=myplot$y,
-+                                             buffer=20,
-+                                             n=100)
-> head(subplotLocations)
+> randSubplots <- getBufferedPoints(x=myplot$x,
++                                   y=myplot$y,
++                                   buffer=20,
++                                   n=250)
+> systSubplots <- getBufferedPoints(x=myplot$x,
++                                     y=myplot$y,
++                                     buffer=20,
++                                     systematic=TRUE,
++                                     by=15)
+> head(randSubplots)
 \end{Sinput}
 \begin{Soutput}
          x        y
-1 563.9821 523.9435
-2 875.9219 308.5930
-3 276.4262 911.6807
-4 339.7110 485.4485
-5 374.0180 446.3255
-6 256.2419 403.6310
+1 701.5746 492.9402
+2 662.9241 192.8330
+3 409.8576 454.9313
+4 959.7612 936.4005
+5 976.9659 611.2381
+6 761.6715 703.7339
+\end{Soutput}
+\begin{Sinput}
+> head(systSubplots)
+\end{Sinput}
+\begin{Soutput}
+         x        y
+1 22.44809 21.07131
+2 22.44809 36.07131
+3 22.44809 51.07131
+4 22.44809 66.07131
+5 22.44809 81.07131
+6 22.44809 96.07131
 \end{Soutput}
 \end{Schunk}
 
 \subsection{sampleSubplots}
-Of course, now that we have our random seedling plots ready, we need to actually see if there are any seedlings inside of our randomly chosen subplot locations. We can use the sampleSubplots() function to do that.
+Of course, now that we have our seedling plots ready, we need to actually see if there are any seedlings inside of our randomly chosen subplot locations. We can use the sampleSubplots() function to do that.
 
-The sampleSubplots function takes your x and y coordinates, builds a box around them, and then subsets your full plot dataframe to see if there are any seedlings present. This function takes our pre-existing subplotLocations and myplot dataframes, and samples appropriately with a subplot size of 25m.
+The sampleSubplots function takes your x and y coordinates, builds a box around them, and then subsets your full plot dataframe to see if there are any seedlings present. This function takes our pre-existing subplot locations and myplot dataframes, and samples appropriately with a subplot size of 25m.
 
 \begin{Schunk}
 \begin{Sinput}
-> seedlingDensity <- sampleSubplots(subplotLocations, myplot, subplotsize=25)
-> head(seedlingDensity)
+> randSeedlingDensity <- sampleSubplots(randSubplots,
++                                       myplot,
++                                       subplotsize=25)
+> head(randSeedlingDensity)
 \end{Sinput}
 \begin{Soutput}
          x        y species numseedlings
 1       NA       NA      NA           NA
-2 563.9821 523.9435       1            1
-3 563.9821 523.9435       4            1
-4 875.9219 308.5930       4            1
-5 746.2678 513.5763       2            1
-6 746.2678 513.5763       4            1
+2 959.7612 936.4005       1            1
+3 672.8342 517.4681       4            1
+4 672.8342 517.4681       5            1
+5 777.3006 146.1837       1            1
+6 777.3006 146.1837       3            1
 \end{Soutput}
 \begin{Sinput}
-> str(seedlingDensity)
+> str(randSeedlingDensity)
 \end{Sinput}
 \begin{Soutput}
-'data.frame':	27 obs. of  4 variables:
- $ x           : num  NA 564 564 876 746 ...
- $ y           : num  NA 524 524 309 514 ...
- $ species     : num  NA 1 4 4 2 4 4 2 5 3 ...
- $ numseedlings: num  NA 1 1 1 1 1 2 1 2 1 ...
+'data.frame':	61 obs. of  4 variables:
+ $ x           : num  NA 960 673 673 777 ...
+ $ y           : num  NA 936 517 517 146 ...
+ $ species     : num  NA 1 4 5 1 3 3 1 5 4 ...
+ $ numseedlings: num  NA 1 1 1 1 1 1 1 1 1 ...
+\end{Soutput}
+\begin{Sinput}
+> systSeedlingDensity <- sampleSubplots(systSubplots,
++                                       myplot,
++                                       subplotsize=10)
+> head(systSeedlingDensity)
+\end{Sinput}
+\begin{Soutput}
+         x        y species numseedlings
+1       NA       NA      NA           NA
+2 22.44809 156.0713       1            1
+3 22.44809 471.0713       2            1
+4 22.44809 681.0713       4            1
+5 22.44809 906.0713       5            1
+6 37.44809 126.0713       2            1
+\end{Soutput}
+\begin{Sinput}
+> str(systSeedlingDensity)
+\end{Sinput}
+\begin{Soutput}
+'data.frame':	153 obs. of  4 variables:
+ $ x           : num  NA 22.4 22.4 22.4 22.4 ...
+ $ y           : num  NA 156 471 681 906 ...
+ $ species     : num  NA 1 2 4 5 2 1 3 4 2 ...
+ $ numseedlings: num  NA 1 1 1 1 1 1 1 1 1 ...
 \end{Soutput}
 \end{Schunk}
 
@@ -179,16 +223,94 @@ The getParentTrees() function works by searching a full plot for trees (where db
 
 \begin{Schunk}
 \begin{Sinput}
-> getParentTrees(seedlingDensity, myplot)
+> randParents <- getParentTrees(randSeedlingDensity, myplot)
+> systParents <- getParentTrees(systSeedlingDensity, myplot)
+> head(randParents)
 \end{Sinput}
 \begin{Soutput}
-  subplotx subploty species numseedlings        m      dbh    treex    treey
-1 746.2678 513.5763       2            1 17.50658 39.47245 752.6982 497.2935
-2 159.0189 534.1358       3            1 15.11443 47.66104 148.0537 523.7335
-3 159.0189 534.1358       3            1 13.84017 37.59841 149.0297 543.7152
+  subplotx  subploty species numseedlings         m      dbh    treex     treey
+1 807.7493 684.10911       5            1  6.524443 48.88866 802.3040 680.51515
+2 607.8512 451.26102       1            2 11.790139 87.79125 615.4009 460.31695
+3 608.9193  26.13498       5            1 13.228046 20.79004 606.8196  13.07463
+4 952.0113 420.01434       5            1  4.948387 58.38689 951.1664 415.13862
+5 367.6224 625.12015       3            1  8.126055 13.57113 369.8776 617.31330
+\end{Soutput}
+\begin{Sinput}
+> nrow(randParents)
+\end{Sinput}
+\begin{Soutput}
+[1] 5
+\end{Soutput}
+\begin{Sinput}
+> head(systParents)
+\end{Sinput}
+\begin{Soutput}
+  subplotx  subploty species numseedlings         m       dbh    treex
+1 127.4481 321.07131       2            1  8.308819 36.394576 135.4600
+2 142.4481 756.07131       3            1 17.848016 65.058796 138.8851
+3 142.4481 756.07131       3            1 15.363776 27.505605 155.5424
+4 217.4481 306.07131       5            1  9.633771 66.686525 215.2592
+5 487.4481  66.07131       2            1 19.915035 90.798106 469.1691
+6 532.4481 891.07131       3            1 19.560899  8.282892 551.6884
+      treey
+1 323.27252
+2 773.56007
+3 748.03490
+4 296.68951
+5  73.97624
+6 894.59822
+\end{Soutput}
+\begin{Sinput}
+> nrow(systParents)
+\end{Sinput}
+\begin{Soutput}
+[1] 16
 \end{Soutput}
 \end{Schunk}
 
+You can see pretty readily that in most cases, systematic sampling over a grid will be the way to extract the most information. Since we are using a randomly generated plot, there is no clumping of trees or seedlings, and most seedling plots should have low numbers of seedlings. In real life, however, seedlings are often clumped together, and that spatial structure would be accurately represented in the sampling scheme. If you recall, we set the subplot size to be much larger on the random sampling than on the systematic sampling. This is the only way to guarantee that \textit{something} is found.
+
+\section{Calculating Parameters for the Ribbens Equation}
+
+So now that we have our parent tree table ready for modeling, how do we go about finding our parameters? For the sake of simplicity, we're going to ignore the ``species'' column in systParents and assume that every record is for the same species. We'll do this by setting species to 1 and rerunning the subplot sampling and parent finding.
+
+\begin{Schunk}
+\begin{Sinput}
+> newplot <- myplot
+> newplot$species <- 1
+> newSeedlings <- sampleSubplots(systSubplots,
++                                       newplot,
++                                       subplotsize=10)
+> newParents <- getParentTrees(newSeedlings, newplot)
+> head(newParents)
+\end{Sinput}
+\begin{Soutput}
+  subplotx subploty species numseedlings         m      dbh     treex    treey
+1 22.44809 471.0713       1            1 16.079451 92.94126 38.504673 471.9286
+2 22.44809 471.0713       1            1  3.740320 73.46949 24.010826 474.4695
+3 22.44809 681.0713       1            1 15.596639 39.57474  9.993568 671.6830
+4 22.44809 906.0713       1            1  7.469008 11.21596 24.667640 913.2029
+5 22.44809 906.0713       1            1  5.815216 88.91823 19.713086 900.9394
+6 22.44809 906.0713       1            1 16.669561 65.55217  7.284792 912.9958
+\end{Soutput}
+\begin{Sinput}
+> unique(newParents$numseedlings)
+\end{Sinput}
+\begin{Soutput}
+[1] 1
+\end{Soutput}
+\end{Schunk}
+
+
+The model that we're trying to run can be written into a formula in R like this:
+
+\begin{Schunk}
+\begin{Sinput}
+> formula <- "numseedlings~(dbh/30)^2 * exp(-m^3)"
+\end{Sinput}
+\end{Schunk}
+
+We will do the normalizer afterwards, because it should not affect the outcome of the model. Now that we have the data.frame and the model, it's a simple matter of running it. Because it is nonlinear, we need to use nls() with some start values.
 
 
 \bibliographystyle{sty/ecology}

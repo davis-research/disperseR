@@ -74,25 +74,40 @@ Of course, the key part of this package is to generate this dataframe and then u
 
 \subsection{getRandomBufferedPoints}
 
-The first thing we need to do is select our subplots. We can do that with the function getRandomBufferedPoints(), which takes an x and a y vector, a buffer value, and ``n'', representing the number of samples that you need. This function then spits out ``n'' random x and y points within the buffered plot space. These locations can represent your seedling plots.
+The first thing we need to do is select our subplots. We can do that with the function getRandomBufferedPoints(), which takes an x and a y vector, a buffer value, and ``n'', representing the number of samples that you need. This function then spits out ``n'' random x and y points within the buffered plot space. These locations can represent your seedling plots. There are two versions of getBufferedPoints, one with random sampling (default), and one with systematic. Both are featured below.
 
 <<>>=
-subplotLocations <- getRandomBufferedPoints(x=myplot$x,
-                                            y=myplot$y,
-                                            buffer=20,
-                                            n=100)
-head(subplotLocations)
+randSubplots <- getBufferedPoints(x=myplot$x,
+                                  y=myplot$y,
+                                  buffer=20,
+                                  n=250)
+
+systSubplots <- getBufferedPoints(x=myplot$x,
+                                    y=myplot$y,
+                                    buffer=20,
+                                    systematic=TRUE,
+                                    by=15)
+head(randSubplots)
+head(systSubplots)
 @
 
 \subsection{sampleSubplots}
-Of course, now that we have our random seedling plots ready, we need to actually see if there are any seedlings inside of our randomly chosen subplot locations. We can use the sampleSubplots() function to do that.
+Of course, now that we have our seedling plots ready, we need to actually see if there are any seedlings inside of our randomly chosen subplot locations. We can use the sampleSubplots() function to do that.
 
-The sampleSubplots function takes your x and y coordinates, builds a box around them, and then subsets your full plot dataframe to see if there are any seedlings present. This function takes our pre-existing subplotLocations and myplot dataframes, and samples appropriately with a subplot size of 25m.
+The sampleSubplots function takes your x and y coordinates, builds a box around them, and then subsets your full plot dataframe to see if there are any seedlings present. This function takes our pre-existing subplot locations and myplot dataframes, and samples appropriately with a subplot size of 25m.
 
 <<>>=
-seedlingDensity <- sampleSubplots(subplotLocations, myplot, subplotsize=25)
-head(seedlingDensity)
-str(seedlingDensity)
+randSeedlingDensity <- sampleSubplots(randSubplots,
+                                      myplot,
+                                      subplotsize=25)
+head(randSeedlingDensity)
+str(randSeedlingDensity)
+
+systSeedlingDensity <- sampleSubplots(systSubplots,
+                                      myplot,
+                                      subplotsize=10)
+head(systSeedlingDensity)
+str(systSeedlingDensity)
 @
 
 Now that we have seedling density in our subplots, we need to figure out how many possible parent trees there are for each of the positive hits. We can do that using the getParentTrees() function.
@@ -102,9 +117,43 @@ Now that we have seedling density in our subplots, we need to figure out how man
 The getParentTrees() function works by searching a full plot for trees (where dbh is \textit{not} NA) that fall within $20 m$ of a seedling plot that contains that species. Of course, you can set that $20 m$ buffer to some other value if you'd like.
 
 <<>>=
-getParentTrees(seedlingDensity, myplot)
+randParents <- getParentTrees(randSeedlingDensity, myplot)
+
+systParents <- getParentTrees(systSeedlingDensity, myplot)
+
+head(randParents)
+nrow(randParents)
+
+head(systParents)
+nrow(systParents)
 @
 
+You can see pretty readily that in most cases, systematic sampling over a grid will be the way to extract the most information. Since we are using a randomly generated plot, there is no clumping of trees or seedlings, and most seedling plots should have low numbers of seedlings. In real life, however, seedlings are often clumped together, and that spatial structure would be accurately represented in the sampling scheme. If you recall, we set the subplot size to be much larger on the random sampling than on the systematic sampling. This is the only way to guarantee that \textit{something} is found.
+
+\section{Calculating Parameters for the Ribbens Equation}
+
+So now that we have our parent tree table ready for modeling, how do we go about finding our parameters? For the sake of simplicity, we're going to ignore the ``species'' column in systParents and assume that every record is for the same species. We'll do this by setting species to 1 and rerunning the subplot sampling and parent finding.
+
+<<>>=
+newplot <- myplot
+newplot$species <- 1
+newSeedlings <- sampleSubplots(systSubplots,
+                                      newplot,
+                                      subplotsize=10)
+newParents <- getParentTrees(newSeedlings, newplot)
+
+head(newParents)
+unique(newParents$numseedlings)
+@
+
+
+The model that we're trying to run can be written into a formula in R like this:
+
+<<>>=
+formula <- "numseedlings~(dbh/30)^2 * exp(-m^3)"
+@
+
+We will do the normalizer afterwards, because it should not affect the outcome of the model. Now that we have the data.frame and the model, it's a simple matter of running it. Because it is nonlinear, we need to use nls() with some start values.
 
 
 \bibliographystyle{sty/ecology}

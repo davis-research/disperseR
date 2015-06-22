@@ -3,5 +3,6 @@
 \contentsline {subsection}{\numberline {2.1}generatePlotMap}{2}
 \contentsline {section}{\numberline {3}Sampling The Plot Map}{3}
 \contentsline {subsection}{\numberline {3.1}getRandomBufferedPoints}{4}
-\contentsline {subsection}{\numberline {3.2}sampleSubplots}{4}
-\contentsline {subsection}{\numberline {3.3}getParentTrees}{5}
+\contentsline {subsection}{\numberline {3.2}sampleSubplots}{5}
+\contentsline {subsection}{\numberline {3.3}getParentTrees}{6}
+\contentsline {section}{\numberline {4}Calculating Parameters for the Ribbens Equation}{7}
