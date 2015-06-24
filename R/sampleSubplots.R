@@ -49,6 +49,8 @@ sampleSubplots <- function(subplotxy, fulldf, subplotsize=1){
   } ## end subplot for loop
 
   ## clean up responsetable
-
-  return(cleanResponse(responsetable))
+responsetable$x <- as.numeric(responsetable$x)
+responsetable$y <- as.numeric(responsetable$y)
+responsetable$numseedlings <- as.numeric(responsetable$numseedlings)
+  return(cleanResponse(responsetable,1))
 }

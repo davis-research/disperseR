@@ -132,78 +132,22 @@ You can see pretty readily that in most cases, systematic sampling over a grid w
 
 \section{Calculating Parameters for the Ribbens Equation}
 
-Unfortunately, because the data above are randomly generated, they will not allow a NLS model to converge on a meaningful parameter set. To get around this and demonstrate the model, we've included a large plot-year dataset called ``expandedTrees''.  This dataset represents unique data when subsetted at the ``plot'' and ``measyear'' columns. You can use ?expandedTrees to find out more about the dataset and how it functions. expandedTrees is generated from ssdAllTrees and ssdPlotDesc, so check those data.frames out too if you need more information.
-
-Since expandedTrees is organized by plot and year, we can take one of those plot-year combinations and run the model. We will also need to generate a seedling map and all of the other steps from above.
-
-Let's look at expandedTrees, and take the first plot-year combination available.
+So now that we have our parent tree table ready for modeling, how do we go about finding our parameters? For the sake of simplicity, we're going to ignore the ``species'' column in systParents and assume that every record is for the same species. We'll do this by setting species to 1 and rerunning the subplot sampling and parent finding.
 
 <<>>=
-head(expandedTrees)
-str(expandedTrees)
+newplot <- myplot
+newplot$species <- 1
+newSeedlings <- sampleSubplots(systSubplots,
+                                      newplot,
+                                      subplotsize=10)
+newParents <- getParentTrees(newSeedlings, newplot)
 
-## get unique plot/year combos
-plotlist <- unique(expandedTrees[,c("plot", "measyear")])
-rownames(plotlist) <- 1:nrow(plotlist)
-
-## count the number of adult trees in a plot/year combination
-plotlist$tree <- NA
-for(i in 1:nrow(plotlist)){
-  plotlist[i, "tree"] <- nrow(expandedTrees[expandedTrees$plot==plotlist[i, "plot"] & expandedTrees$measyear==plotlist[i, "measyear"] & expandedTrees$stage=="tree",])
-}
-
-
-## get number of seedlings in a plot/year combo
-plotlist$seedlings <- NA
-for(i in 1:nrow(plotlist)){
-  plotlist[i, "seedlings"] <- nrow(expandedTrees[expandedTrees$plot==plotlist[i, "plot"] & expandedTrees$measyear==plotlist[i, "measyear"] & expandedTrees$stage=="seedling",])
-}
-
-## eliminate any plots that have only trees or seedlings
-plotlist <- plotlist[plotlist$tree!=0 & plotlist$seedlings!=0,]
-@
-
-For now, let's take a large plot, like trinity, in one of its middle years. The data.frame knows exactly when seedlings established in middle years, because plots were checked years for establishment. Let's do trinity in 2001:
-
-<<>>=
-trinity01 <- expandedTrees[expandedTrees$plot=="trinity" & expandedTrees$measyear==2001,]
-nrow(trinity01[trinity01$stage=="seedling",])
-str(trinity01)
-
-## set up for plot
-## by stage
-trinity01$colors <- ifelse(trinity01$stage=="seedling", "red", "blue")
-## by species
-specieslist <- unique(trinity01$species)
-for(i in 1:length(specieslist)){
-  trinity01[trinity01$species==specieslist[i],"pch"] <- as.numeric(i)
-}
+head(newParents)
+unique(newParents$numseedlings)
 @
 
 
-Now, let's take a look at the distribution of seedlings and adults by species. This is just a simple graph of trinity01, not scaled to dbh at all. See the code above for the color/species designations
-
-<<fig=TRUE>>=
-plot(trinity01$x, trinity01$y, pch=trinity01$pch, col=trinity01$colors)
-@
-
-
-And now let's establish the seedling subplots, and get a list of seedlings within:
-
-<<>>=
-trinSubplotPoints <- getBufferedPoints(x=trinity01$x,
-                  y=trinity01$y,
-                  buffer=0,
-                  systematic=TRUE,
-                  by=1)
-trinSeedlingDensity <- sampleSubplots(trinSubplotPoints,
-                                      trinity01,
-                                      subplotsize=2)
-
-parents <- getParentTrees(trinSeedlingDensity, trinity01)
-nrow(trinSeedlingDensity)
-@
-
+The model that we're trying to run can be written into a formula in R like this:
 
 <<>>=
 formula <- "numseedlings~(dbh/30)^2 * exp(-m^3)"

@@ -46,25 +46,25 @@ We can generate a sample plot easily with generatePlotMap(). As you can see belo
 > head(myplot)
 \end{Sinput}
 \begin{Soutput}
-  species        x        y dbh
-1       1 807.4247 507.8046  NA
-2       1 716.7755 250.1089  NA
-3       1 663.9457 754.5766  NA
-4       1 142.9948 374.6370  NA
-5       1 530.3830 221.6209  NA
-6       1 609.4712 460.2917  NA
+  species        x         y dbh
+1       1 682.3933 809.03516  NA
+2       1 737.1198 819.60389  NA
+3       1 276.6965 644.21518  NA
+4       1 188.8645  25.50809  NA
+5       1 674.3391  97.88794  NA
+6       1 497.6840 373.42402  NA
 \end{Soutput}
 \begin{Sinput}
 > tail(myplot)
 \end{Sinput}
 \begin{Soutput}
-    species        x        y      dbh
-745       5 966.5782 529.7618 48.87171
-746       5 358.1308 784.8376 54.50437
-747       5 187.9779 648.3317 62.67000
-748       5 942.6674 496.2957 29.26230
-749       5 122.2823 142.3175 57.63271
-750       5 533.8458 553.2040 65.55217
+    species         x        y       dbh
+745       5 514.59424 732.7313  9.831125
+746       5 321.11006 670.6481 86.743725
+747       5  39.06801 172.8954 43.521936
+748       5 817.92071 986.0897  4.193633
+749       5 736.13663 428.6691 66.677322
+750       5 572.22437 357.7299 97.841379
 \end{Soutput}
 \end{Schunk}
 
@@ -80,8 +80,8 @@ If you do have your own data, just make sure that it matches the column names of
 \begin{Soutput}
 'data.frame':	750 obs. of  4 variables:
  $ species: int  1 1 1 1 1 1 1 1 1 1 ...
- $ x      : num  807 717 664 143 530 ...
- $ y      : num  508 250 755 375 222 ...
+ $ x      : num  682 737 277 189 674 ...
+ $ y      : num  809 819.6 644.2 25.5 97.9 ...
  $ dbh    : num  NA NA NA NA NA NA NA NA NA NA ...
 \end{Soutput}
 \begin{Sinput}
@@ -106,12 +106,12 @@ Now that we have a plot map ready, we need to be able to sample the plot.  \cite
 \end{Sinput}
 \begin{Soutput}
   subplot species numseedlings      DBH          m
-1       1       1            2 22.60360 10.4383481
-2       2       1            4 89.85045  9.6430821
-3       3       1            6 57.95143  5.4454423
-4       1       1            2 69.76575  3.4763289
-5       2       1            4 91.61190 11.8251530
-6       3       1            6 72.63399  0.9457134
+1       1       1            2 76.76357  0.6914451
+2       2       1            4 91.26904 13.2737498
+3       3       1            6 99.09348 17.4093326
+4       1       1            2 82.51591  3.6851337
+5       2       1            4 82.17220 17.5440590
+6       3       1            6 83.58254 11.6466238
 \end{Soutput}
 \end{Schunk}
 
@@ -136,24 +136,24 @@ The first thing we need to do is select our subplots. We can do that with the fu
 \end{Sinput}
 \begin{Soutput}
          x        y
-1 701.5746 492.9402
-2 662.9241 192.8330
-3 409.8576 454.9313
-4 959.7612 936.4005
-5 976.9659 611.2381
-6 761.6715 703.7339
+1 106.4777 432.7103
+2 892.1748 807.0640
+3 242.1621 524.3938
+4 875.4936 219.4684
+5 110.8899 167.0975
+6 243.4821 943.3789
 \end{Soutput}
 \begin{Sinput}
 > head(systSubplots)
 \end{Sinput}
 \begin{Soutput}
-         x        y
-1 22.44809 21.07131
-2 22.44809 36.07131
-3 22.44809 51.07131
-4 22.44809 66.07131
-5 22.44809 81.07131
-6 22.44809 96.07131
+        x        y
+1 20.5046 20.68595
+2 20.5046 35.68595
+3 20.5046 50.68595
+4 20.5046 65.68595
+5 20.5046 80.68595
+6 20.5046 95.68595
 \end{Soutput}
 \end{Schunk}
 
@@ -172,20 +172,20 @@ The sampleSubplots function takes your x and y coordinates, builds a box around 
 \begin{Soutput}
          x        y species numseedlings
 1       NA       NA      NA           NA
-2 959.7612 936.4005       1            1
-3 672.8342 517.4681       4            1
-4 672.8342 517.4681       5            1
-5 777.3006 146.1837       1            1
-6 777.3006 146.1837       3            1
+2 875.4936 219.4684       2            1
+3 243.4821 943.3789       3            1
+4 447.6189 530.1617       4            1
+5 333.2174 333.6699       1            1
+6 333.2174 333.6699       3            1
 \end{Soutput}
 \begin{Sinput}
 > str(randSeedlingDensity)
 \end{Sinput}
 \begin{Soutput}
-'data.frame':	61 obs. of  4 variables:
- $ x           : num  NA 960 673 673 777 ...
- $ y           : num  NA 936 517 517 146 ...
- $ species     : num  NA 1 4 5 1 3 3 1 5 4 ...
+'data.frame':	58 obs. of  4 variables:
+ $ x           : num  NA 875 243 448 333 ...
+ $ y           : num  NA 219 943 530 334 ...
+ $ species     : num  NA 2 3 4 1 3 2 5 3 5 ...
  $ numseedlings: num  NA 1 1 1 1 1 1 1 1 1 ...
 \end{Soutput}
 \begin{Sinput}
@@ -195,22 +195,22 @@ The sampleSubplots function takes your x and y coordinates, builds a box around 
 > head(systSeedlingDensity)
 \end{Sinput}
 \begin{Soutput}
-         x        y species numseedlings
-1       NA       NA      NA           NA
-2 22.44809 156.0713       1            1
-3 22.44809 471.0713       2            1
-4 22.44809 681.0713       4            1
-5 22.44809 906.0713       5            1
-6 37.44809 126.0713       2            1
+        x       y species numseedlings
+1      NA      NA      NA           NA
+2 20.5046 485.686       5            1
+3 20.5046 770.686       1            1
+4 35.5046 290.686       1            1
+5 35.5046 920.686       4            1
+6 80.5046 140.686       4            1
 \end{Soutput}
 \begin{Sinput}
 > str(systSeedlingDensity)
 \end{Sinput}
 \begin{Soutput}
-'data.frame':	153 obs. of  4 variables:
- $ x           : num  NA 22.4 22.4 22.4 22.4 ...
- $ y           : num  NA 156 471 681 906 ...
- $ species     : num  NA 1 2 4 5 2 1 3 4 2 ...
+'data.frame':	156 obs. of  4 variables:
+ $ x           : num  NA 20.5 20.5 35.5 35.5 ...
+ $ y           : num  NA 486 771 291 921 ...
+ $ species     : num  NA 5 1 1 4 4 3 1 3 3 ...
  $ numseedlings: num  NA 1 1 1 1 1 1 1 1 1 ...
 \end{Soutput}
 \end{Schunk}
@@ -228,12 +228,12 @@ The getParentTrees() function works by searching a full plot for trees (where db
 > head(randParents)
 \end{Sinput}
 \begin{Soutput}
-  subplotx  subploty species numseedlings         m      dbh    treex     treey
-1 807.7493 684.10911       5            1  6.524443 48.88866 802.3040 680.51515
-2 607.8512 451.26102       1            2 11.790139 87.79125 615.4009 460.31695
-3 608.9193  26.13498       5            1 13.228046 20.79004 606.8196  13.07463
-4 952.0113 420.01434       5            1  4.948387 58.38689 951.1664 415.13862
-5 367.6224 625.12015       3            1  8.126055 13.57113 369.8776 617.31330
+  subplotx subploty species numseedlings         m       dbh    treex    treey
+1 875.4936 219.4684       2            1 10.428084  4.651992 880.4859 210.3130
+2 243.4821 943.3789       3            1 18.756808 26.745528 224.7354 943.9958
+3 510.8421 341.4967       2            1  1.316163 41.626723 509.7010 340.8410
+4 150.0724 211.0229       1            1 11.953042 72.996951 151.9816 222.8225
+5 413.7655 370.3031       3            1 16.087525 90.549446 429.4578 366.7591
 \end{Soutput}
 \begin{Sinput}
 > nrow(randParents)
@@ -245,26 +245,19 @@ The getParentTrees() function works by searching a full plot for trees (where db
 > head(systParents)
 \end{Sinput}
 \begin{Soutput}
-  subplotx  subploty species numseedlings         m       dbh    treex
-1 127.4481 321.07131       2            1  8.308819 36.394576 135.4600
-2 142.4481 756.07131       3            1 17.848016 65.058796 138.8851
-3 142.4481 756.07131       3            1 15.363776 27.505605 155.5424
-4 217.4481 306.07131       5            1  9.633771 66.686525 215.2592
-5 487.4481  66.07131       2            1 19.915035 90.798106 469.1691
-6 532.4481 891.07131       3            1 19.560899  8.282892 551.6884
-      treey
-1 323.27252
-2 773.56007
-3 748.03490
-4 296.68951
-5  73.97624
-6 894.59822
+  subplotx subploty species numseedlings         m       dbh     treex    treey
+1  95.5046  245.686       3            1 10.816910 90.098207  97.41352 235.0388
+2 125.5046  575.686       4            1 11.231532 93.827086 116.16538 581.9250
+3 140.5046  455.686       5            1 10.603783 21.885939 151.10834 455.7182
+4 230.5046  950.686       3            1  8.834149 26.745528 224.73540 943.9958
+5 290.5046  395.686       5            1 17.779329  4.651992 276.78155 384.3819
+6 335.5046  290.686       2            1  6.338324 78.862813 329.39817 288.9872
 \end{Soutput}
 \begin{Sinput}
 > nrow(systParents)
 \end{Sinput}
 \begin{Soutput}
-[1] 16
+[1] 8
 \end{Soutput}
 \end{Schunk}
 
@@ -272,37 +265,137 @@ You can see pretty readily that in most cases, systematic sampling over a grid w
 
 \section{Calculating Parameters for the Ribbens Equation}
 
-So now that we have our parent tree table ready for modeling, how do we go about finding our parameters? For the sake of simplicity, we're going to ignore the ``species'' column in systParents and assume that every record is for the same species. We'll do this by setting species to 1 and rerunning the subplot sampling and parent finding.
+Unfortunately, because the data above are randomly generated, they will not allow a NLS model to converge on a meaningful parameter set. To get around this and demonstrate the model, we've included a large plot-year dataset called ``expandedTrees''.  This dataset represents unique data when subsetted at the ``plot'' and ``measyear'' columns. You can use ?expandedTrees to find out more about the dataset and how it functions. expandedTrees is generated from ssdAllTrees and ssdPlotDesc, so check those data.frames out too if you need more information.
+
+Since expandedTrees is organized by plot and year, we can take one of those plot-year combinations and run the model. We will also need to generate a seedling map and all of the other steps from above.
+
+Let's look at expandedTrees, and take the first plot-year combination available.
 
 \begin{Schunk}
 \begin{Sinput}
-> newplot <- myplot
-> newplot$species <- 1
-> newSeedlings <- sampleSubplots(systSubplots,
-+                                       newplot,
-+                                       subplotsize=10)
-> newParents <- getParentTrees(newSeedlings, newplot)
-> head(newParents)
+> head(expandedTrees)
 \end{Sinput}
 \begin{Soutput}
-  subplotx subploty species numseedlings         m      dbh     treex    treey
-1 22.44809 471.0713       1            1 16.079451 92.94126 38.504673 471.9286
-2 22.44809 471.0713       1            1  3.740320 73.46949 24.010826 474.4695
-3 22.44809 681.0713       1            1 15.596639 39.57474  9.993568 671.6830
-4 22.44809 906.0713       1            1  7.469008 11.21596 24.667640 913.2029
-5 22.44809 906.0713       1            1  5.815216 88.91823 19.713086 900.9394
-6 22.44809 906.0713       1            1 16.669561 65.55217  7.284792 912.9958
+    plot treeid species ingrowth firstrec deathyear        x        y measyear
+2 bellow   7093    PIMO     2003     2003        NA 100733.1 51405.46     2003
+3 bellow   7093    PIMO     2003     2003        NA 100733.1 51405.46     2008
+4 bellow   7093    PIMO     2003     2003        NA 100733.1 51405.46     2013
+5 bellow   7094    PIMO     2004     2004        NA 100732.7 51405.07     2008
+6 bellow   7094    PIMO     2004     2004        NA 100732.7 51405.07     2013
+7 bellow   7095    PIMO     2004     2004        NA 100733.2 51405.02     2008
+  dbh    stage
+2 1.2 seedling
+3 2.1     tree
+4 2.7     tree
+5 2.1 seedling
+6 3.8     tree
+7 2.4 seedling
 \end{Soutput}
 \begin{Sinput}
-> unique(newParents$numseedlings)
+> str(expandedTrees)
 \end{Sinput}
 \begin{Soutput}
-[1] 1
+'data.frame':	51493 obs. of  11 variables:
+ $ plot     : chr  "bellow" "bellow" "bellow" "bellow" ...
+ $ treeid   : num  7093 7093 7093 7094 7094 ...
+ $ species  : chr  "PIMO" "PIMO" "PIMO" "PIMO" ...
+ $ ingrowth : num  2003 2003 2003 2004 2004 ...
+ $ firstrec : num  2003 2003 2003 2004 2004 ...
+ $ deathyear: num  NA NA NA NA NA NA NA NA NA NA ...
+ $ x        : num  100733 100733 100733 100733 100733 ...
+ $ y        : num  51405 51405 51405 51405 51405 ...
+ $ measyear : num  2003 2008 2013 2008 2013 ...
+ $ dbh      : num  1.2 2.1 2.7 2.1 3.8 2.4 4.1 8.1 8.1 8.2 ...
+ $ stage    : chr  "seedling" "tree" "tree" "seedling" ...
 \end{Soutput}
+\begin{Sinput}
+> ## get unique plot/year combos
+> plotlist <- unique(expandedTrees[,c("plot", "measyear")])
+> rownames(plotlist) <- 1:nrow(plotlist)
+> ## count the number of adult trees in a plot/year combination
+> plotlist$tree <- NA
+> for(i in 1:nrow(plotlist)){
++   plotlist[i, "tree"] <- nrow(expandedTrees[expandedTrees$plot==plotlist[i, "plot"] & expandedTrees$measyear==plotlist[i, "measyear"] & expandedTrees$stage=="tree",])
++ }
+> ## get number of seedlings in a plot/year combo
+> plotlist$seedlings <- NA
+> for(i in 1:nrow(plotlist)){
++   plotlist[i, "seedlings"] <- nrow(expandedTrees[expandedTrees$plot==plotlist[i, "plot"] & expandedTrees$measyear==plotlist[i, "measyear"] & expandedTrees$stage=="seedling",])
++ }
+> ## eliminate any plots that have only trees or seedlings
+> plotlist <- plotlist[plotlist$tree!=0 & plotlist$seedlings!=0,]
+\end{Sinput}
+\end{Schunk}
+
+For now, let's take a large plot, like trinity, in one of its middle years. The data.frame knows exactly when seedlings established in middle years, because plots were checked years for establishment. Let's do trinity in 2001:
+
+\begin{Schunk}
+\begin{Sinput}
+> trinity01 <- expandedTrees[expandedTrees$plot=="trinity" & expandedTrees$measyear==2001,]
+> nrow(trinity01[trinity01$stage=="seedling",])
+\end{Sinput}
+\begin{Soutput}
+[1] 431
+\end{Soutput}
+\begin{Sinput}
+> str(trinity01)
+\end{Sinput}
+\begin{Soutput}
+'data.frame':	2402 obs. of  11 variables:
+ $ plot     : chr  "trinity" "trinity" "trinity" "trinity" ...
+ $ treeid   : num  1532 1534 1535 1536 1537 ...
+ $ species  : chr  "ABCO" "ABCO" "ABCO" "ABCO" ...
+ $ ingrowth : num  NA NA NA NA NA NA NA NA NA NA ...
+ $ firstrec : num  1991 1991 1991 1991 1991 ...
+ $ deathyear: num  NA NA 2012 NA 2003 ...
+ $ x        : num  88904 88903 88900 88900 88902 ...
+ $ y        : num  48744 48741 48738 48737 48736 ...
+ $ measyear : num  2001 2001 2001 2001 2001 ...
+ $ dbh      : num  15.3 13.9 7.5 15.5 2 18.3 32.5 10.6 22.5 17.2 ...
+ $ stage    : chr  "tree" "tree" "tree" "tree" ...
+\end{Soutput}
+\begin{Sinput}
+> ## set up for plot
+> ## by stage
+> trinity01$colors <- ifelse(trinity01$stage=="seedling", "red", "blue")
+> ## by species
+> specieslist <- unique(trinity01$species)
+> for(i in 1:length(specieslist)){
++   trinity01[trinity01$species==specieslist[i],"pch"] <- as.numeric(i)
++ }
+\end{Sinput}
 \end{Schunk}
 
 
-The model that we're trying to run can be written into a formula in R like this:
+Now, let's take a look at the distribution of seedlings and adults by species. This is just a simple graph of trinity01, not scaled to dbh at all. See the code above for the color/species designations
+
+\begin{Schunk}
+\begin{Sinput}
+> plot(trinity01$x, trinity01$y, pch=trinity01$pch, col=trinity01$colors)
+\end{Sinput}
+\end{Schunk}
+\includegraphics{disperseRmanual-009}
+
+
+And now let's establish the seedling subplots, and get a list of seedlings within:
+
+\begin{Schunk}
+\begin{Sinput}
+> trinSubplotPoints <- getBufferedPoints(x=trinity01$x,
++                   y=trinity01$y,
++                   buffer=0,
++                   systematic=TRUE,
++                   by=1)
+> trinSeedlingDensity <- sampleSubplots(trinSubplotPoints,
++                                       trinity01,
++                                       subplotsize=1)
+> nrow(trinSeedlingDensity)
+\end{Sinput}
+\begin{Soutput}
+[1] 8
+\end{Soutput}
+\end{Schunk}
+
 
 \begin{Schunk}
 \begin{Sinput}
