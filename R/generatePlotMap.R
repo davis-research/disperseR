@@ -10,7 +10,7 @@
 #'  trees generated that should be seedlings
 #'@param maxnum A number of vector of number of trees per species
 #'
-#'@example
+#'@examples
 #'generatePlotMap(species=3, plotlength=100, plotwidth=100,
 #'maxsize=100, propSeeds=0.5, maxnum=20)
 #'
@@ -47,6 +47,7 @@ generatePlotMap <- function(species=5, plotlength=1000, plotwidth=1000, maxsize=
 
   ## generate DBH's
 
-  treemap <- data.frame(species=speciesvec, x=xcoord, y=ycoord, dbh=dbhvec)
+  treemap <- data.frame(treeid=1:length(xcoord), species=speciesvec, x=xcoord, y=ycoord, dbh=dbhvec)
+  treemap$stage <- ifelse(is.na(treemap$dbh), "seedling", "tree")
   return(treemap)
 }

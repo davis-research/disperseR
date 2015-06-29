@@ -8,3 +8,4 @@ Maintainer: Samantha L Davis <clubtenna@gmail.com>
 Description: This package handles exhaustive plot data and calculates seed dispersal within that plot. To use it, you'll need (x,y) corrdinates and dbh (where possible) of all seedlings, saplings, and adult trees in a given area.
 License: GPL 4.0
 LazyData: TRUE
+Suggests: testthat

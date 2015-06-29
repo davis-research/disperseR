@@ -6,7 +6,7 @@
 #' @param y The y-coordinate of the center of your box.
 #' @param buffer The distance, in coordinate space, of the searchradius
 #'
-#' @example
+#' @examples
 #' getBoxBoundaries(2, 5, 1)
 #'
 #' @export

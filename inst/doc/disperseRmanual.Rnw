@@ -17,7 +17,7 @@ Spatial seed dispersal is characterized by a single equation,
 
 \begin{equation}
 \label{eq:dispersal}
-R_i = STR * \sum\limits_{k=1}^T\left( \frac{DBH_k}{30}\right) ^2 e^{-Dm_{ik}^3} * \left( \frac{1}{n}\right)
+R_i = STR * \sum\limits_{k=1}^T\left( \frac{DBH_k}{30}\right) ^\beta e^{-Dm_{ik}^3} * \left( \frac{1}{n}\right)
 \end{equation}
 
 where \textit{n} is a normalizer function that standardizes the equation to values between 0 and 1,
@@ -26,7 +26,7 @@ where \textit{n} is a normalizer function that standardizes the equation to valu
 n = \int\limits_{0}^\infty e^{-Dm_{ik}^3} \nonumber
 \end{equation}
 
-and where \textit{STR} is the standardized number of tree recruits, \textit{DBH} is the diameter at breast height, \textit{D} is a species-specific parameter estimated by this equation, and \textit{m} is the distance between the measured point \textit{i} and adult tree \textit{k}, summed over each adult tree (\textit{k}=1 to \textit{T} adult trees). These equations were originally established by \citet{Ribbens1994}, in an experiment where seedling per $m^2$ along a belt transect were correlated to the number and size of any adults within a $20 m$ radius.
+and where \textit{STR} is the standardized number of tree recruits, \textit{DBH} is the diameter at breast height, \textit{$\beta$} is a modifier of DBH and STR,  \textit{D} is a species-specific parameter estimated by this equation, and \textit{m} is the distance between the measured point \textit{i} and adult tree \textit{k}, summed over each adult tree (\textit{k}=1 to \textit{T} adult trees). These equations were originally established by \citet{Ribbens1994}, in an experiment where seedling per $m^2$ along a belt transect were correlated to the number and size of any adults within a $20 m$ radius.
 
 The first piece of the equation, containing STR, establishes the number of recruits produced for a tree of a standard DBH (30cm), and the second piece of the equation establishes the mean density of recruits found in a $1 m^2$ quadrat centered at \textit{m} distance away from the parent tree. Finally, $\frac{1}{n}$ serves as a normalizer to standardize the equation across species.
 
@@ -45,9 +45,7 @@ head(myplot)
 tail(myplot)
 @
 
-Now that we have a plotmap, we can focus on creating the spatial dispersal equations. Obviously, since this plot map is random, our end parameters will be useless, but this will at least demonstrate proof-of-concept, and you can apply it to real data later.
-
-If you do have your own data, just make sure that it matches the column names of the plot map generated above, and also the data types. You can check the structure of a dataframe using str() and then as.numeric() or as.character() to adjust as needed. In our case, you need four columns: species, x, y, and DBH. x, y, and DBH should all be numeric. ``species'' can be a character vector or a numeric vector, as long as the species names are unique.
+If you do have your own data, just make sure that it matches the column names of the plot map generated above, and also the data types. You can check the structure of a dataframe using str() and then as.numeric() or as.character() to adjust as needed. In our case, you need five columns: treeid, species, x, y, and dbh. x, y, and dbh should all be numeric. ``species'' can be a character vector or a numeric vector, as long as the species names are unique. ``treeid'' is a unique identifier for each tree. If you generate randomly, it will match the rownumbers of your resulting data.frame. You'll also need a ``stage'' column, which is just a shortcut for figuring out if a record is for a seedling or a tree.
 
 <<>>=
 ## exploring the structure of myplot
@@ -59,102 +57,161 @@ myplot$species <- as.numeric(myplot$species)
 
 \section{Sampling The Plot Map}
 
-Now that we have a plot map ready, we need to be able to sample the plot.  \citet{Ribbens1994} sampled using a belt transect, stopping every so often to count all of the seedlings in a $1 m^2$ plot, and all adult trees within $20m$ of the seedling plot. So, for each seedling plot sampled, we need records of adult trees' DBH and their distance to the seedling subplot, up to 20m away. The end table to plug into the equation might look something like:
+Now that we have a plot map ready, we need to be able to sample the plot.  \citet{Ribbens1994} sampled using a belt transect, stopping every so often to count all of the seedlings in a $1 m^2$ plot, and all adult trees within $20m$ of the seedling plot. We have an advantage, in that we have the exhaustive map and can just sample for every individual or clump of seedlings there is.
+
+We can do this with a ``find and eliminate'' approach. For each possible seedling, subsetted from the plot map, we can search around it at ``m'' distance to see if there are other seedlings. We can count the total number of seedlings in that box, store the (x,y) and number (n) in a data.frame, prevent the counted seedlings from getting re-counted, and move to the next row. This functionality is wrapped up in the findSeedPlots() function in disperseR, demonstrated below. Remember, your input data.frame will need all of the columns generated by generatePlotMap().
 
 <<>>=
-spatialDisperseDf <- data.frame(subplot=rep(1:3,5),
-                                species=1,
-                                numseedlings=rep(c(2,4,6), 5),
-                                DBH=runif(15, 0, 100),
-                                m=runif(15, 0, 20))
-head(spatialDisperseDf)
+
+## make a sample seed data.frame by subsetting the included
+## expandedTrees data.frame..
+seeds <- myplot[myplot$stage=="seedling",]
+
+## we'll need this one later...
+adults <- myplot[myplot$stage=="tree",]
+## show the start of results
+myseedplots <- findSeedPlots(seeds, 1)
+head(myseedplots)
+
+## What are the possible densities of our seedplots?
+unique(myseedplots$n)
 @
 
-Of course, the key part of this package is to generate this dataframe and then use it for analysis. There are obviously several ways to sample that are as statstically valid as the belt transect method, and given that we have the benefit of an exhaustive map of a given plot, we should consider using other sampling methods that generate the same sort of information without the linear bias. For ease, this package picks the locations of seedling subplots from your plot randomly, with a buffer around the length and width to prevent trying to find adult trees outside of the plot area.
 
-\subsection{getRandomBufferedPoints}
 
-The first thing we need to do is select our subplots. We can do that with the function getRandomBufferedPoints(), which takes an x and a y vector, a buffer value, and ``n'', representing the number of samples that you need. This function then spits out ``n'' random x and y points within the buffered plot space. These locations can represent your seedling plots. There are two versions of getBufferedPoints, one with random sampling (default), and one with systematic. Both are featured below.
+Now that we have seedling density in our subplots, we need to figure out how many possible parent trees there are for each of the positive hits. We can do that using the findAdultTrees() function.
+
+\subsection{findAdultTrees}
+
+The findAdultTrees() function works by searching a full plot for trees that are ``m'' distance away from the points provided (seedling plot points).
 
 <<>>=
-randSubplots <- getBufferedPoints(x=myplot$x,
-                                  y=myplot$y,
-                                  buffer=20,
-                                  n=250)
-
-systSubplots <- getBufferedPoints(x=myplot$x,
-                                    y=myplot$y,
-                                    buffer=20,
-                                    systematic=TRUE,
-                                    by=15)
-head(randSubplots)
-head(systSubplots)
+parentTrees <- findAdultTrees(myseedplots, adults, 20)
+head(parentTrees)
+nrow(parentTrees)
 @
 
-\subsection{sampleSubplots}
-Of course, now that we have our seedling plots ready, we need to actually see if there are any seedlings inside of our randomly chosen subplot locations. We can use the sampleSubplots() function to do that.
-
-The sampleSubplots function takes your x and y coordinates, builds a box around them, and then subsets your full plot dataframe to see if there are any seedlings present. This function takes our pre-existing subplot locations and myplot dataframes, and samples appropriately with a subplot size of 25m.
-
-<<>>=
-randSeedlingDensity <- sampleSubplots(randSubplots,
-                                      myplot,
-                                      subplotsize=25)
-head(randSeedlingDensity)
-str(randSeedlingDensity)
-
-systSeedlingDensity <- sampleSubplots(systSubplots,
-                                      myplot,
-                                      subplotsize=10)
-head(systSeedlingDensity)
-str(systSeedlingDensity)
-@
-
-Now that we have seedling density in our subplots, we need to figure out how many possible parent trees there are for each of the positive hits. We can do that using the getParentTrees() function.
-
-\subsection{getParentTrees}
-
-The getParentTrees() function works by searching a full plot for trees (where dbh is \textit{not} NA) that fall within $20 m$ of a seedling plot that contains that species. Of course, you can set that $20 m$ buffer to some other value if you'd like.
-
-<<>>=
-randParents <- getParentTrees(randSeedlingDensity, myplot)
-
-systParents <- getParentTrees(systSeedlingDensity, myplot)
-
-head(randParents)
-nrow(randParents)
-
-head(systParents)
-nrow(systParents)
-@
-
-You can see pretty readily that in most cases, systematic sampling over a grid will be the way to extract the most information. Since we are using a randomly generated plot, there is no clumping of trees or seedlings, and most seedling plots should have low numbers of seedlings. In real life, however, seedlings are often clumped together, and that spatial structure would be accurately represented in the sampling scheme. If you recall, we set the subplot size to be much larger on the random sampling than on the systematic sampling. This is the only way to guarantee that \textit{something} is found.
+Now, you can see that the random plot map that we've generated doesn't work too well on its default values at getting ``good'' values for this equation. ``ri'', in particular, should have more than one unique value if it's going to be used as a predictor value. Now that we've shown proof of concept for these functions, however, we're going to get around the limitation of random data by using some data that comes in the package, known as expandedTrees. This data is obfuscated real data, as you'll see below.
 
 \section{Calculating Parameters for the Ribbens Equation}
 
-So now that we have our parent tree table ready for modeling, how do we go about finding our parameters? For the sake of simplicity, we're going to ignore the ``species'' column in systParents and assume that every record is for the same species. We'll do this by setting species to 1 and rerunning the subplot sampling and parent finding.
+Unfortunately, because the data above are randomly generated, they will not allow a NLS model to converge on a meaningful parameter set. To get around this and demonstrate the model, we've included a large plot-year dataset called ``expandedTrees''.  This dataset represents unique data when subsetted at the ``plot'' and ``measyear'' columns. You can use ?expandedTrees to find out more about the dataset and how it functions. expandedTrees is generated from ssdAllTrees and ssdPlotDesc, so check those data.frames out too if you need more information.
+
+Since expandedTrees is organized by plot and year, we can take one of those plot-year combinations and run the model. We will also need to generate a seedling map and all of the other steps from above.
+
+Let's look at expandedTrees, and take the first plot-year combination available.
 
 <<>>=
-newplot <- myplot
-newplot$species <- 1
-newSeedlings <- sampleSubplots(systSubplots,
-                                      newplot,
-                                      subplotsize=10)
-newParents <- getParentTrees(newSeedlings, newplot)
+head(expandedTrees)
+str(expandedTrees)
 
-head(newParents)
-unique(newParents$numseedlings)
+## get unique plot/year combos
+plotlist <- unique(expandedTrees[,c("plot", "measyear")])
+rownames(plotlist) <- 1:nrow(plotlist)
+
+## count the number of adult trees in a plot/year combination
+plotlist$tree <- NA
+for(i in 1:nrow(plotlist)){
+  plotlist[i, "tree"] <- nrow(expandedTrees[expandedTrees$plot==plotlist[i, "plot"] & expandedTrees$measyear==plotlist[i, "measyear"] & expandedTrees$stage=="tree",])
+}
+
+
+## get number of seedlings in a plot/year combo
+plotlist$seedlings <- NA
+for(i in 1:nrow(plotlist)){
+  plotlist[i, "seedlings"] <- nrow(expandedTrees[expandedTrees$plot==plotlist[i, "plot"] & expandedTrees$measyear==plotlist[i, "measyear"] & expandedTrees$stage=="seedling",])
+}
+
+## eliminate any plots that have only trees or seedlings
+plotlist <- plotlist[plotlist$tree!=0 & plotlist$seedlings!=0,]
+@
+
+For now, let's take a large plot, like trinity, in one of its middle years. The data.frame knows exactly when seedlings established in middle years, because plots were checked years for establishment. Let's do trinity in 2001:
+
+<<>>=
+trinity01 <- expandedTrees[expandedTrees$plot=="trinity" & expandedTrees$measyear==2001,]
+nrow(trinity01[trinity01$stage=="seedling",])
+str(trinity01)
+
+## set up for plot
+## by stage
+trinity01$colors <- ifelse(trinity01$stage=="seedling", "red", "blue")
+## by species
+specieslist <- unique(trinity01$species)
+for(i in 1:length(specieslist)){
+  trinity01[trinity01$species==specieslist[i],"pch"] <- as.numeric(i)
+}
 @
 
 
-The model that we're trying to run can be written into a formula in R like this:
+Now, let's take a look at the distribution of seedlings and adults by species. This is just a simple graph of trinity01, not scaled to dbh at all. See the code above for the color/species designations
 
-<<>>=
-formula <- "numseedlings~(dbh/30)^2 * exp(-m^3)"
+<<fig=TRUE>>=
+plot(trinity01$x, trinity01$y, pch=trinity01$pch, col=trinity01$colors)
 @
 
-We will do the normalizer afterwards, because it should not affect the outcome of the model. Now that we have the data.frame and the model, it's a simple matter of running it. Because it is nonlinear, we need to use nls() with some start values.
 
+And now let's separate out the seedlings from trees, and run our scripts to get parentTrees. The scripts also only deal with a single species, so we'll pick one.
+
+<<>>=
+## get seeds and adults ready
+trinSeeds <- trinity01[trinity01$stage=="seedling" &
+                         trinity01$species=="ABCO", ]
+trinAdults <- trinity01[trinity01$stage=="tree" &
+                         trinity01$species=="ABCO", ]
+
+seedlingPlots <- findSeedPlots(trinSeeds, 1)
+parentTrees <- findAdultTrees(seedlingPlots, trinAdults, 20)
+
+## check that there are multiple seedling densities,
+## and parentTrees looks right.
+str(parentTrees)
+unique(parentTrees$ri)
+@
+
+Yay, we have a functioning parentTrees dataframe that we can use to estimate parameters! Onto the parameters. If you remember from above, we are trying to to find parameters for this equation:
+
+\begin{equation}
+\label{eq:dispersal-repeat}
+R_i = STR * \sum\limits_{k=1}^T\left( \frac{DBH_k}{30}\right) ^\beta e^{-Dm_{ik}^3} * \left( \frac{1}{n}\right)
+\end{equation}
+
+To estimate STR, $\beta$, and D, we'll need to run a non-linear least squares model. But, to be honest, those are super-breakable and suck in R. If you notice, however, this equation only non-linear because of the second half ($e^{...}$). As all ecologists love to do, we can take the natural log of boths sides of this equation and turn it into a linear model that looks something like this:
+
+\begin{equation}
+\label{eq:log-disp}
+ln(R_i) = ln(STR) + \beta * ln(\frac{DBH}{30}) + D * m^3
+\end{equation}
+
+This transformation means that the parameters we are estimating, $\beta$, STR, and D, are all related linearly to the other parameters. In layman's terms, that means that we can now predict the parameters using the much more robust and unbreakable function glm() in R. The formula we'll be using looks like this:
+
+<<>>=
+formula <- "log(ri)~log(dbh/30) + m^3"
+@
+
+As a reminder, the log() function in R gives the natural log (ln, or $log_e$), not the $log_{10}$ value.
+
+We will do the normalizer afterwards, because it should not affect the outcome of the model. Now that we have the data.frame and the model, it's a simple matter of running it, then taking a look at the transformed parameters and converting them back to the form we need them in.
+
+<<>>=
+myModel <- glm(formula, data=parentTrees)
+summary(myModel)
+@
+
+As you can see, that's about as simple as you can get! But what do these parameters mean? The intercept in this is actually the ln(STR), so we need to do $e^i$ to find the value of STR. The parameter generated for dbh is representative of $\beta$ without transformation. And the parameter generated for m is equivalent to -D, so we need to get the negative value for it to be equal to D.
+
+<<>>=
+STR <- exp(myModel$coefficients[1])
+beta <- myModel$coefficients[2]
+D <- -myModel$coefficients[3]
+
+STR
+beta
+D
+
+@
+
+And that is the simple way to get parameters for these equations!
 
 \bibliographystyle{sty/ecology}
 \bibliography{disperseRmanual}

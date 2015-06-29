@@ -16,7 +16,7 @@
 #'@return This function returns a data.frame of x and y values within the buffer
 #'  zone designated in the function call.
 #'
-#'@example
+#'@examples
 #'getRandomBufferedPoints(generatePlotMap()[,"x"],generatePlotMap()[,"y"],
 #'buffer=10, n=5)
 #'

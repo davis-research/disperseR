@@ -70,6 +70,8 @@ findAdultTrees <- function(seedPlots, adults, m){
  ## initialize response table
   responsetable <- data.frame(treeid=NA, ri=NA, m=NA, dbh=NA, stringsAsFactors=FALSE)
 
+  ##convert row numbers to treeids.
+  rownames(adults) <- adults$treeid
 
   ## for each seedling plot...
   for(i in 1:nrow(seedPlots)){
@@ -77,9 +79,12 @@ findAdultTrees <- function(seedPlots, adults, m){
       dist(rbind(seedPlots[i,c("x", "y")], adults[,c("x", "y")]),
         diag=FALSE), rownames.force=TRUE)
     close <- distmat[distmat[,1]<=m & distmat[,1]>0,1]
-    treeids <- names(close)
-    dbh <- adults[adults$treeid%in%treeids, "dbh"]
-    responsetable <- rbind(responsetable, data.frame(treeid=treeids, ri=seedPlots[i, "n"], m=unname(close), dbh=dbh, stringsAsFactors=FALSE))
+    treeids <- as.numeric(names(close))
+    print(head(treeids))
+    dbhs <- adults[charmatch(treeids, adults$treeid),"dbh"]
+    newdata <- data.frame(treeid=treeids, ri=seedPlots[i, "n"], m=unname(close), dbh=dbhs, stringsAsFactors=FALSE)
+
+    responsetable <- rbind(responsetable, newdata)
   }
   return(cleanResponse(responsetable,1))
 
@@ -89,3 +94,29 @@ head(adults)
 adults[adults$treeid==1532,]
 adults[adults$treeid==2650,]
 adults[adults$treeid==5093,]
+
+## now, to estimate parameters, we need to do some R magic. NLS() is pretty hard
+## to converge, but we can convert it into a linear formula with a log
+## transformation. For DBH, we're going to let the model estimate Beta, because
+## it's easiest. In contrast, we'll keep Theta at 3 and transform it before we
+## enter it into the model.
+
+## standardize DBH without Beta
+adults$stdDBH <- (adults$dbh/30)
+
+## standardize m with Theta
+adults$m3 <- adults$m^3
+
+
+## ok, time to try the equation
+formula <- "log(ri)~log(stdDBH) + m3"
+store <- glm(formula, data=adults)
+summary(store)
+## yay, we have a model! Now, let's make sense of it. If we raise the intercept like so, e^i, that will convert it back to the true STR value.
+STR <- exp(store$coefficients[1])
+
+##Now the parameter for the log(dbh) is the exponent of the equation, or Beta.
+Beta <- store$coefficients[2]
+
+## And the parameter for m3 is -D
+D <- -store$coefficients[3]
