@@ -55,6 +55,7 @@ myplot$species <- as.numeric(myplot$species)
 @
 
 
+\chapter{When Seedlings Are In Your Plot}
 \section{Sampling The Plot Map}
 
 Now that we have a plot map ready, we need to be able to sample the plot.  \citet{Ribbens1994} sampled using a belt transect, stopping every so often to count all of the seedlings in a $1 m^2$ plot, and all adult trees within $20m$ of the seedling plot. We have an advantage, in that we have the exhaustive map and can just sample for every individual or clump of seedlings there is.
@@ -211,7 +212,9 @@ D
 
 @
 
-And that is the simple way to get parameters for these equations!
+\chapter{When You're Using Seed Traps}
+
+In some cases, your seed data will be completely separate from your individual tree map. Unlike Eastern forests, mountain pine forests often grow very slowly, and it can take a long time for seedlings to emerge and begin growth. As a result, you may commonly miss seedlings if you're mapping, or it may be difficult to tell when they emerged. In these cases, you can use seed traps to estimate seedling dispersal. One major caveat is that the number of viable seeds caught may correlate with, but will not match the true seedling establishment rate.
 
 \bibliographystyle{sty/ecology}
 \bibliography{disperseRmanual}
