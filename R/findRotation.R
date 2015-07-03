@@ -32,7 +32,7 @@ findRotation <- function(xleft, yleft, xbot, ybot){
     stop("Sorry, you have not given the leftmost or bottommost points. Either xleft > xbot or ybot >= yleft.")
   }
 
-  conversion <- 90-cart2polar(xleft, yleft, xbot, ybot)$theta
+  conversion <- 360-cart2polar(xleft, yleft, xbot, ybot)$theta
 
   return(conversion)
 }

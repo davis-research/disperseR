@@ -26,8 +26,7 @@ So, I think I need to do a loop for each of the 13,000 rows in ssdAllTrees. I sh
 <<>>=
 ## load library
 library(disperseR)
-## switching column order
-ssdAllTrees <- cbind(ssdAllTrees[,c(1:6, 14:15, 7:13)])
+
 
 ##subsetting by years sampled
 sevenyears <- ssdAllTrees[ssdAllTrees$plot=="bellow" |
@@ -57,7 +56,7 @@ sixyears <- sixyears[,-16]
 
 Okay, so I now have three dataframes with DBH values that can be acted upon for each year. Let's get to writing this function. It should take a vector, which is a row of the dataframe. We know the identities of each of the first 9 columns for this vector, and the rest are to be dealt with in a loop. This function should output a data.frame that can be bound to a response data.frame. This response data.frame should be organized like so: Plot Name, Subplot, Tag, Species, Measure Year, Ingrowth Year, First Record Year, Death Year, x, y, DBH, Class
 
-We need the first column, the plot, to look up sampling years. Columns 2 thru 4 just need to tag along, we don't need any information from them.  If the ingrowth year is NA, that means that the tree was present in the plot before it was established. Now, in these plots, trees are checked yearly for establishment and death, but only measured every few years. What we know from ingrowth year, then, is the year that a seedling germinated and established. If ingrowth year is NOT NA, then we know the tree's entire life history, from the moment it was ``born'', and we can build the rows based on that.
+We need the plot, to look up sampling years. The other early columns just need to tag along, we don't need any information from them.  If the ingrowth year is NA, that means that the tree was present in the plot before it was established. Now, in these plots, trees are checked yearly for establishment and death, but only measured every few years. What we know from ingrowth year, then, is the year that a seedling germinated and established. If ingrowth year is NOT NA, then we know the tree's entire life history, from the moment it was ``born'', and we can build the rows based on that.
 
 If ingrowth year is NA, it gets a bit trickier. To deal with this, we can do a check. If there's no ingrowthyear, that means that the tree was alive before plot establishment. Therefore, we can make an assumption that if its first dbh value is NA, then it was too small to measure, e.g., a seedling. Otherwise, it's already a tree.
 
@@ -80,6 +79,7 @@ i <- 1
 j <- 1
 
     finalrows <- data.frame(plot="dummy",
+                            subplot="dummy",
                             treeid="dummy",
                             species="dummy",
                             ingrowth="dummy",
@@ -133,6 +133,7 @@ for(i in 1:nrow(samplerows)){
     if(length(years)==0){
           addedrow <- NULL
           addedrow <- data.frame(plot=samplerows[i, "plot"],
+                        subplot=samplerows[i, "subplot"],
                         treeid=samplerows[i, "treeid"],
                         species=samplerows[i, "sppcode"],
                         ingrowth=samplerows[i, "ingrowthyear"],
@@ -164,6 +165,7 @@ for(i in 1:nrow(samplerows)){
         ## build row for new table.
         addedrow <- NULL
           addedrow <- data.frame(plot=samplerows[i, "plot"],
+                        subplot=samplerows[i, "subplot"],
                         treeid=samplerows[i, "treeid"],
                         species=samplerows[i, "sppcode"],
                         ingrowth=samplerows[i, "ingrowthyear"],
@@ -205,6 +207,11 @@ tail(palate)
 
 The run time on this is not great, so we need to do it outside of the Sweave document. I'll save it all as an R object for the package. The R-object is entitled ``expandedTrees'' and can be loaded directly after the package loads. Keep in mind that the messy x/y coordinates are just because of a conversion to character, and I cleaned those up in the final dataset. I also converted everything back to numeric where necessary.
 <<>>=
+
+## responses <- list()
+## for(i in 1:length(plotnames)){ responses[[plotnames[i]]] <- processTreeRows(ssdAllTrees[ssdAllTrees$plot==plotnames[i],], ssdPlotDesc, ssdAllTrees)}
+## expandedTrees <- rbind(responses[[1]], responses[[2]], responses[[3]], responses[[4]], responses[[5]], responses[[6]], responses[[7]], responses[[8]], responses[[9]], responses[[10]], responses[[11]], responses[[12]])
+##
 head(expandedTrees)
 str(expandedTrees)
 @

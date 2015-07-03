@@ -21,25 +21,17 @@ rotatePlot <- function(df, origin=c(0,0)){
   leftmost <- df[df$x==min(df$x), c("x", "y") ]
   bottommost <- df[df$y==min(df$y), c("x", "y")]
 
-  if(nrow(leftmost) > 1 | nrow(bottommost) > 1){
-    warning("You have repeat minimum x or y values.")
-  }
-
   if(leftmost[1, "y"] == bottommost[1, "y"]){
     stop("Sorry, your plot is already aligned correctly. leftmost y == bottommost y. If you believe this is an incorrect error, you may have repeat bottommost y values.")
   }
 
  conversion <- findRotation(leftmost[1,"x"], leftmost[1,"y"], bottommost[1,"x"], bottommost[1,"y"])
 
- ##save leftmost by keeping it in
+ ##save leftmost by setting origin slightly to left of leftmost point
 
- polardf <- cart2polar(leftmost[1,1], leftmost[1,2], df$x, df$y)
- polardf$theta <- polardf$theta + conversion
+ polardf <- cart2polar(leftmost[1,1]-1, leftmost[1,2]-1, df$x, df$y)
+ polardf$theta <- polardf$theta+conversion
  newdf <- polar2cart(origin[1], origin[2], polardf$r, polardf$theta)
-
- ##set leftmost NaN's to origin.
- newdf[newdf$x=="NaN", "x"] <- origin[1]
- newdf[newdf$y=="NaN", "y"] <- origin[2]
 
  df$x <- round(newdf$x)
  df$y <- round(newdf$y)

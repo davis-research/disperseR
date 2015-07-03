@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass{report}
 \usepackage{natbib}
 \title{DisperseR: Calculating Seed Dispersal In R}
 \author{Samantha L. Davis}
@@ -7,7 +7,7 @@
 \tableofcontents
 \SweaveOpts{concordance=TRUE}
 
-\section{Introduction}
+\chapter{Introduction}
 
 This is a small package intended to help users calculating seed dispersal in R. Although the R base machinery is capable of doing so, this package streamlines the process and enables you to focus more on the important aspects of data analysis instead of data generation or clean-up.
 
@@ -34,6 +34,8 @@ The parameters \textit{STR} and {D} are both needed by SORTIE-ND, an individual 
 
 What follows is a list of functions alongside example usage. To start, you must import or generate a plot map of all trees in a given area. This plot map must include a species identifier, an x coordinate, a y coordinate, and DBH (or NA) for each individual.
 
+\chapter{Using Coherent Plot Map Data}
+
 \section{Generating Plot Map}
 
 \subsection{generatePlotMap}
@@ -54,8 +56,6 @@ str(myplot)
 myplot$species <- as.numeric(myplot$species)
 @
 
-
-\chapter{When Seedlings Are In Your Plot}
 \section{Sampling The Plot Map}
 
 Now that we have a plot map ready, we need to be able to sample the plot.  \citet{Ribbens1994} sampled using a belt transect, stopping every so often to count all of the seedlings in a $1 m^2$ plot, and all adult trees within $20m$ of the seedling plot. We have an advantage, in that we have the exhaustive map and can just sample for every individual or clump of seedlings there is.
@@ -113,14 +113,22 @@ rownames(plotlist) <- 1:nrow(plotlist)
 ## count the number of adult trees in a plot/year combination
 plotlist$tree <- NA
 for(i in 1:nrow(plotlist)){
-  plotlist[i, "tree"] <- nrow(expandedTrees[expandedTrees$plot==plotlist[i, "plot"] & expandedTrees$measyear==plotlist[i, "measyear"] & expandedTrees$stage=="tree",])
+  plotlist[i, "tree"] <- nrow(
+                          expandedTrees[
+                           expandedTrees$plot==plotlist[i, "plot"] &
+                           expandedTrees$measyear==plotlist[i, "measyear"] &
+                           expandedTrees$stage=="tree",])
 }
 
 
 ## get number of seedlings in a plot/year combo
 plotlist$seedlings <- NA
 for(i in 1:nrow(plotlist)){
-  plotlist[i, "seedlings"] <- nrow(expandedTrees[expandedTrees$plot==plotlist[i, "plot"] & expandedTrees$measyear==plotlist[i, "measyear"] & expandedTrees$stage=="seedling",])
+  plotlist[i, "seedlings"] <- nrow(
+                               expandedTrees[
+                               expandedTrees$plot==plotlist[i, "plot"] &
+                               expandedTrees$measyear==plotlist[i, "measyear"] &
+                               expandedTrees$stage=="seedling",])
 }
 
 ## eliminate any plots that have only trees or seedlings
@@ -130,7 +138,9 @@ plotlist <- plotlist[plotlist$tree!=0 & plotlist$seedlings!=0,]
 For now, let's take a large plot, like trinity, in one of its middle years. The data.frame knows exactly when seedlings established in middle years, because plots were checked years for establishment. Let's do trinity in 2001:
 
 <<>>=
-trinity01 <- expandedTrees[expandedTrees$plot=="trinity" & expandedTrees$measyear==2001,]
+trinity01 <- expandedTrees[
+              expandedTrees$plot=="trinity" &
+              expandedTrees$measyear==2001,]
 nrow(trinity01[trinity01$stage=="seedling",])
 str(trinity01)
 
@@ -212,9 +222,49 @@ D
 
 @
 
-\chapter{When You're Using Seed Traps}
+\chapter{Using Seed Trap Data}
 
 In some cases, your seed data will be completely separate from your individual tree map. Unlike Eastern forests, mountain pine forests often grow very slowly, and it can take a long time for seedlings to emerge and begin growth. As a result, you may commonly miss seedlings if you're mapping, or it may be difficult to tell when they emerged. In these cases, you can use seed traps to estimate seedling dispersal. One major caveat is that the number of viable seeds caught may correlate with, but will not match the true seedling establishment rate.
+
+Now, to use seed trap data, you must know where each seed trap is located in your plots. In the data that we are using, we know the plot layout for each individual plot and their respective subplots, we know which subplots have seed traps, and we know the placement of seedtraps within subplots. However, we do not know the precise (x,y) locations of seed traps. We also have a complicating factor: in some cases, because these are real data, the coordinates are in UTMN/UTME, but not all of our plots are aligned perfectly on a N-S, E-W orientation.
+
+Now, all other things aside, the easiest way to approach this problem is to rotate our plots to make them align correctly. This is the easiest way because a function to locate the seed traps, given the subplot locations, has already been established.
+
+We can approach this problem using the rotatePlot() function. If we look through our plots, we see that the first plot in expandedTrees, "bellow" is rotated. We will fix it using rotatePlot().
+
+<<>>=
+bellow <- expandedTrees[expandedTrees$plot=="bellow",]
+
+## make a color column, set it to "black"
+  bellow$col <- "black"
+## Set the leftmost points, the points we're rotating on, to red
+  bellow[bellow$x==min(bellow$x), "col"] <- "red"
+
+## Rotate plot
+  rotatebellow <- rotatePlot(bellow)
+@
+
+\newpage
+<<fig=TRUE, height=8>>=
+## plot
+par(mfrow=c(2,1))
+plot(bellow$x, bellow$y, col=bellow$col)
+plot(rotatebellow$x, rotatebellow$y, col=rotatebellow$col)
+par(mfrow=c(1,1))
+@
+
+Ok, so we can successfully rotate the plots. The other important thing to note is that the only things altered between bellow and rotatebellow are their (x,y) coordinates. Everything else, all of the extraneous columns, like "col", are kept the same. That means, in data.frames where we have subplot information, we can figure out where the subplots are in both rotated and unrotated space. Luckily, expandedTrees does have subplot information! So, let's get a feel for the subplot layout in bellow.
+
+<<fig=TRUE>>=
+
+rainbowColors <- rainbow(max(bellow$subplot))
+palette(rainbowColors)
+plot(rotatebellow$x, rotatebellow$y, col=rotatebellow$subplot)
+
+@
+We can see from the figure that rotate bellow's subplot 1 starts in the top left, fills through the bottom, and does three columns like that. bellow is approximately 75 meters along the x axis and 150 meters along the y axis. Since we know each subplot is 25x25m, we can generate a subplot corners dataframe that knows the corners of each of the subplot boundaries. This is the data.frame we'll need to find the trap locations.
+
+
 
 \bibliographystyle{sty/ecology}
 \bibliography{disperseRmanual}

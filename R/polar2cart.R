@@ -39,5 +39,12 @@ polar2cart<-function(x,y,dist,bearing,as.deg=TRUE, rnd=NA){
     newx <- round(newx, rnd)
     newy <- round(newy, rnd)
   }
+
+  if(min(newx) < x){
+    newx <- newx + (x-min(newx))
+  }
+  if(min(newy) < y){
+    newy <- newy + (y-min(newy))
+  }
   return(data.frame("x"=newx,"y"=newy, stringsAsFactors=F))
 }

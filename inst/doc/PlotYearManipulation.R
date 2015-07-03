@@ -1,12 +1,11 @@
 ### R code from vignette source 'PlotYearManipulation.Rnw'
 
 ###################################################
-### code chunk number 1: PlotYearManipulation.Rnw:26-55
+### code chunk number 1: PlotYearManipulation.Rnw:26-54
 ###################################################
 ## load library
 library(disperseR)
-## switching column order
-ssdAllTrees <- cbind(ssdAllTrees[,c(1:6, 14:15, 7:13)])
+
 
 ##subsetting by years sampled
 sevenyears <- ssdAllTrees[ssdAllTrees$plot=="bellow" |
@@ -35,7 +34,7 @@ sixyears <- sixyears[,-16]
 
 
 ###################################################
-### code chunk number 2: PlotYearManipulation.Rnw:65-193
+### code chunk number 2: PlotYearManipulation.Rnw:64-195
 ###################################################
 ## get values where ingrowthyear has a value, for testing
 samplerows <- head(ssdAllTrees[!is.na(ssdAllTrees$ingrowthyear),])
@@ -54,6 +53,7 @@ i <- 1
 j <- 1
 
     finalrows <- data.frame(plot="dummy",
+                            subplot="dummy",
                             treeid="dummy",
                             species="dummy",
                             ingrowth="dummy",
@@ -107,6 +107,7 @@ for(i in 1:nrow(samplerows)){
     if(length(years)==0){
           addedrow <- NULL
           addedrow <- data.frame(plot=samplerows[i, "plot"],
+                        subplot=samplerows[i, "subplot"],
                         treeid=samplerows[i, "treeid"],
                         species=samplerows[i, "sppcode"],
                         ingrowth=samplerows[i, "ingrowthyear"],
@@ -138,6 +139,7 @@ for(i in 1:nrow(samplerows)){
         ## build row for new table.
         addedrow <- NULL
           addedrow <- data.frame(plot=samplerows[i, "plot"],
+                        subplot=samplerows[i, "subplot"],
                         treeid=samplerows[i, "treeid"],
                         species=samplerows[i, "sppcode"],
                         ingrowth=samplerows[i, "ingrowthyear"],
@@ -168,7 +170,7 @@ nrow(finalrows)
 
 
 ###################################################
-### code chunk number 3: PlotYearManipulation.Rnw:198-203
+### code chunk number 3: PlotYearManipulation.Rnw:200-205
 ###################################################
 palate <- processTreeRows(ssdAllTrees[ssdAllTrees$plot=="palate",], ssdPlotDesc, ssdAllTrees)
 str(palate)
@@ -178,8 +180,13 @@ tail(palate)
 
 
 ###################################################
-### code chunk number 4: PlotYearManipulation.Rnw:207-209
+### code chunk number 4: PlotYearManipulation.Rnw:209-216
 ###################################################
+
+## responses <- list()
+## for(i in 1:length(plotnames)){ responses[[plotnames[i]]] <- processTreeRows(ssdAllTrees[ssdAllTrees$plot==plotnames[i],], ssdPlotDesc, ssdAllTrees)}
+## expandedTrees <- rbind(responses[[1]], responses[[2]], responses[[3]], responses[[4]], responses[[5]], responses[[6]], responses[[7]], responses[[8]], responses[[9]], responses[[10]], responses[[11]], responses[[12]])
+##
 head(expandedTrees)
 str(expandedTrees)
 
