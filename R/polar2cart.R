@@ -40,6 +40,19 @@ polar2cart<-function(x,y,dist,bearing,as.deg=TRUE, rnd=NA){
     newy <- round(newy, rnd)
   }
 
+##if we get a table in where the origin is equal to one of the points, it's
+##going to show badly, as NaN, in the transformation. Since we know that this is
+##the only time the NaN shows, we can simply set those to our origin points
+##after transformation.
+
+for(i in 1:length(newx)){
+  if(is.nan(newx[i])){
+    newx[i] <- x
+    newy[i] <- y
+  }
+}
+
+
   if(min(newx) < x){
     newx <- newx + (x-min(newx))
   }

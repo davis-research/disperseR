@@ -27,30 +27,18 @@ rotatePlot <- function(df, origin=c(0,0), rnd=0, truesw=c(0,0)){
     stop("Sorry, x and y columns are not numeric or do not exist.")
   }
 
-  leftmost <- df[df$x==min(df$x), c("x", "y") ]
   bottommost <- df[df$y==min(df$y), c("x", "y")]
 
-  if(leftmost[1, "y"] == bottommost[1, "y"]){
-    stop("Sorry, your plot is already aligned correctly. leftmost y == bottommost y. If you believe this is an incorrect error, you may have repeat bottommost y values.")
-  }
 
-  ## if truesw is set, that represents a different origin point.
-  if(truesw==c(0,0)){
-    conversion <- findRotation(leftmost[1,"x"],
-                               leftmost[1,"y"],
-                               bottommost[1,"x"],
-                               bottommost[1,"y"])
-  } else{
     conversion <- findRotation(truesw[1],
                                truesw[2],
                                bottommost[1,"x"],
-                               bottommost[1, "y"])
-  }
+                               bottommost[1,"y"])
 
  ##save leftmost by setting origin slightly to left of leftmost point
 
- polardf <- cart2polar(leftmost[1,1]-1, leftmost[1,2]-1, df$x, df$y)
- polardf$theta <- polardf$theta+conversion
+ polardf <- cart2polar(truesw[1], truesw[2], df$x, df$y)
+ polardf$theta <- polardf$theta+conversion+90
  newdf <- polar2cart(origin[1], origin[2], polardf$r, polardf$theta)
 
  df$x <- round(newdf$x, rnd)
