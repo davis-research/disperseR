@@ -264,6 +264,36 @@ plot(rotatebellow$x, rotatebellow$y, col=rotatebellow$subplot)
 @
 We can see from the figure that rotate bellow's subplot 1 starts in the top left, fills through the bottom, and does three columns like that. bellow is approximately 75 meters along the x axis and 150 meters along the y axis. Since we know each subplot is 25x25m, we can generate a subplot corners dataframe that knows the corners of each of the subplot boundaries. This is the data.frame we'll need to find the trap locations.
 
+Let's check and see what the dimensions on these plots are, and if they are truly made of 25x25 subplots.
+
+<<>>=
+##get names of subplots
+plotnames <- unique(expandedTrees$plot)
+
+##quick function to calculate ranges of x's and y's
+getRange <- function(x){
+  store <- max(x) - min(x)
+  return(store)
+}
+
+## set up response table
+plotdimensions <- data.frame(
+  plot=plotnames,
+  xrange=0,
+  yrange=0,
+  stringsAsFactors=FALSE)
+
+##do loop through
+for(i in 1:length(plotnames)){
+  plotdimensions[i, "xrange"] <- getRange(expandedTrees[expandedTrees$plot==plotnames[i],"x"])
+    plotdimensions[i, "yrange"] <- getRange(expandedTrees[expandedTrees$plot==plotnames[i],"y"])
+}
+
+## view plot dimensions
+plotdimensions
+
+
+@
 
 
 \bibliographystyle{sty/ecology}

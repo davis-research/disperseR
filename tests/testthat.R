@@ -12,6 +12,23 @@ test_that("cart2polar responses align in correct orientation", {
   expect_equal(cart2polar(0,0,2,-2)$theta, 315)
 })
 
+context("cleanResponse")
+
+test_that("cleanResponse functions correctly", {
+  expect_equal(cleanResponse(data.frame(x=c(1,2), y=c(1,2))), cleanResponse(data.frame(x=c(1,2), y=c(1,2))))
+  expect_equal(cleanResponse(data.frame(x=c(1,2), y=c(1,2)), rm.rows=1), cleanResponse(data.frame(x=c(2), y=c(2))))
+})
+
+
+context("countAdultsInRadius")
+
+test_that("countAdultsInRadius functions correctly",
+          expect_equal(countAdultsInRadius(c(1,2), data.frame(x=c(1:5), y=c(1:5)),6),5)
+          expect_equal(countAdultsInRadius(c(1,2), data.frame(x=c(1:5), y=c(1:5)),2),2)
+          )
+
+
+
 context("findRotation")
 
 test_that("Results are expected", {
