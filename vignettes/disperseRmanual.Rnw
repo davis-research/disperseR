@@ -241,7 +241,10 @@ bellow <- expandedTrees[expandedTrees$plot=="bellow",]
   bellow[bellow$x==min(bellow$x), "col"] <- "red"
 
 ## Rotate plot
-  rotatebellow <- rotatePlot(bellow)
+## We need the "true southwestern corner", which in this case is the leftmost point.
+  rotatebellow <- rotatePlot(bellow,
+                             truesw=c(min(bellow$x),
+                                      bellow[bellow$x==min(bellow$x), "y"]))
 @
 
 \newpage
@@ -285,8 +288,10 @@ plotdimensions <- data.frame(
 
 ##do loop through
 for(i in 1:length(plotnames)){
-  plotdimensions[i, "xrange"] <- getRange(expandedTrees[expandedTrees$plot==plotnames[i],"x"])
-    plotdimensions[i, "yrange"] <- getRange(expandedTrees[expandedTrees$plot==plotnames[i],"y"])
+  plotdimensions[i, "xrange"] <- getRange(
+    expandedTrees[expandedTrees$plot==plotnames[i],"x"])
+    plotdimensions[i, "yrange"] <- getRange(
+      expandedTrees[expandedTrees$plot==plotnames[i],"y"])
 }
 
 ## view plot dimensions
