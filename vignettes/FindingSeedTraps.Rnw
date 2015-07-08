@@ -29,7 +29,7 @@ As you can see, these are more or less unchanged from the original data files. W
 <<>>=
 #install.packages("devtools")
 library(devtools)
-#install_github("ecology-rocks/disperseR")
+install_github("ecology-rocks/disperseR")
 library(disperseR)
 @
 
@@ -96,12 +96,12 @@ Okay. We know the plot is 100x100, and we know the subplot file originally used 
 
 <<>>=
 ## get coords
-  xcoords <- getSubplotCoords(corners[1:2], increment=25)
-  ycoords <- getSubplotCoords(corners[3:4], increment=25)
+#  xcoords <- getSubplotCoords(corners[1:2], increment=25)
+#  ycoords <- getSubplotCoords(corners[3:4], increment=25)
 
 ##make sure the values are right...
-  xcoords
-  ycoords
+#  xcoords
+#  ycoords
 @
 
 
