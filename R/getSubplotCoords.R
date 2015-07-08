@@ -12,6 +12,7 @@
 #'
 #' @examples
 #' getSubplotCoords()
+#' @export
 
 getSubplotCoords <- function(minmax=c(0,100), increment=25){
   xcount <- minmax[1]+increment
