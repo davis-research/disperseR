@@ -4,18 +4,29 @@
 \alias{rotatePlot}
 \title{Rotate Plot To NSEW Orientation}
 \usage{
-rotatePlot(df, origin = c(0, 0))
+rotatePlot(df, origin = c(0, 0), rnd = 0, truesw = c(0, 0))
 }
 \arguments{
-\item{df}{A data.frame containing an "x" and a "y" column, representing coordinates. Other information about the data.frame (extra columns) should be retained.}
+\item{df}{A data.frame containing an "x" and a "y" column, representing
+coordinates. Other information about the data.frame (extra columns) should
+be retained.}
 
-\item{origin}{A vector of two numbers representing the desired (x,y) coordinates of the desired origin of the resulting dataframe. This defaults to 0,0, meaning that the left/bottom-most point will be at (0,0)}
+\item{origin}{A vector of two numbers representing the desired (x,y)
+coordinates of the desired origin of the resulting dataframe. This defaults
+to 0,0, meaning that the left/bottom-most point will be at (0,0)}
+
+\item{rnd}{A rounding value, defaults to 0, for the new (x,y) coordinates.}
+
+\item{truesw}{The most southwestern point of the plot, even if it is farther
+  out than any of the trees.}
 }
 \value{
-This function returns the data.frame from "x", with modified x and y columns.
+This function returns the data.frame from "x", with modified x and y
+  columns.
 }
 \description{
-This function takes a plot that is not oriented at true North/South and rotates it to be correct.
+This function takes a plot that is not oriented at true North/South and
+rotates it to be correct.
 }
 \examples{
 rotatePlot(data.frame(x=c(0,4), y=c(0,-3), stringsAsFactors=FALSE))

@@ -7,7 +7,7 @@
 #' @param forest An (x,y) data.frame of search points.
 #' @param m The radius to search by.
 #'
-#' @returns This function returns a number representing the total number of
+#' @return This function returns a number representing the total number of
 #'   records found. This function operates on the dist() function in R, and does
 #'   not search in a square, but rather, a circle.
 #'
