@@ -241,10 +241,12 @@ bellow <- expandedTrees[expandedTrees$plot=="bellow",]
   bellow[bellow$x==min(bellow$x), "col"] <- "red"
 
 ## Rotate plot
-## We need the "true southwestern corner", which in this case is the leftmost point.
+## We need the "true southwestern corner", which can be found in ssdPlotDesc
   rotatebellow <- rotatePlot(bellow,
-                             truesw=c(min(bellow$x),
-                                      bellow[bellow$x==min(bellow$x), "y"]))
+                             truesw=c(
+                               ssdPlotDesc[ssdPlotDesc$plot=="bellow", "x"],
+                               ssdPlotDesc[ssdPlotDesc$plot=="bellow", "y"]
+                               ))
 @
 
 \newpage
@@ -265,6 +267,7 @@ palette(rainbowColors)
 plot(rotatebellow$x, rotatebellow$y, col=rotatebellow$subplot)
 
 @
+
 We can see from the figure that rotate bellow's subplot 1 starts in the top left, fills through the bottom, and does three columns like that. bellow is approximately 75 meters along the x axis and 150 meters along the y axis. Since we know each subplot is 25x25m, we can generate a subplot corners dataframe that knows the corners of each of the subplot boundaries. This is the data.frame we'll need to find the trap locations.
 
 Let's check and see what the dimensions on these plots are, and if they are truly made of 25x25 subplots.
@@ -297,6 +300,31 @@ for(i in 1:length(plotnames)){
 ## view plot dimensions
 plotdimensions
 
+
+@
+
+So it seems like some are, and some are not. So we better build a program to draw subplots that can handle the weird ones. We built a few functions to handle drawing boxes. These functions are demonstrated below.
+
+<<fig=TRUE>>=
+
+## get the min and max values for each corner.
+corners <- c(0, max(rotatebellow$x), 0, max(rotatebellow$y))
+
+## get the box corners based on a 25 m incremented subplot:
+## ## get coords
+  xcoords <- getSubplotCoords(corners[1:2], increment=25)
+  ycoords <- getSubplotCoords(corners[3:4], increment=25)
+
+  xcoords
+  ycoords
+
+##build the boxes and check our work.
+
+  bellowSubplots <- buildBoxes(xcoords, ycoords)
+
+  ## check our work
+plot(rotatebellow$x, rotatebellow$y, pch=".", xlim=c(corners[1], corners[2]), ylim=c(corners[3], corners[4]))
+points(bellowSubplots$POINT_X, bellowSubplots$POINT_Y, col="red", pch=4)
 
 @
 

@@ -26,12 +26,6 @@
 
 findRotation <- function(xleft, yleft, xbot, ybot){
 
-  ## make sure that "leftmost" and "bottommost" are actually accurate.
-  ##
-  if(xleft > xbot | ybot >= yleft){
-    stop("Sorry, you have not given the leftmost or bottommost points. Either xleft > xbot or ybot >= yleft.")
-  }
-
   conversion <- 360-cart2polar(xleft, yleft, xbot, ybot)$theta
 
   return(conversion)
