@@ -144,7 +144,7 @@ subplotsForTraps
 
 
 ###################################################
-### code chunk number 10: FindingSeedTraps.Rnw:185-194
+### code chunk number 10: FindingSeedTraps.Rnw:185-191
 ###################################################
 trapcoords <- trapUTM(
   filename="../data/BBBPIPO_subpolygon_corners.csv",
@@ -153,6 +153,10 @@ trapcoords <- trapUTM(
   bearing=0,
   plotcorns=list(T,paste("../data/","BBBPIPO","_traps.png",sep="")))
 
+
+###################################################
+### code chunk number 11: FindingSeedTraps.Rnw:196-198
+###################################################
 plot(rotateBBB$x, rotateBBB$y, pch=".")
 points(trapcoords$XCoord, trapcoords$YCoord, col="red")
 

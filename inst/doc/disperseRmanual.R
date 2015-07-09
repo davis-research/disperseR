@@ -136,7 +136,7 @@ summary(myModel)
 
 
 ###################################################
-### code chunk number 11: disperseRmanual.Rnw:214-222
+### code chunk number 11: disperseRmanual.Rnw:216-224
 ###################################################
 STR <- exp(myModel$coefficients[1])
 beta <- myModel$coefficients[2]
@@ -145,76 +145,6 @@ D <- -myModel$coefficients[3]
 STR
 beta
 D
-
-
-
-###################################################
-### code chunk number 12: disperseRmanual.Rnw:235-247
-###################################################
-bellow <- expandedTrees[expandedTrees$plot=="bellow",]
-
-## make a color column, set it to "black"
-  bellow$col <- "black"
-## Set the leftmost points, the points we're rotating on, to red
-  bellow[bellow$x==min(bellow$x), "col"] <- "red"
-
-## Rotate plot
-## We need the "true southwestern corner", which in this case is the leftmost point.
-  rotatebellow <- rotatePlot(bellow,
-                             truesw=c(min(bellow$x),
-                                      bellow[bellow$x==min(bellow$x), "y"]))
-
-
-###################################################
-### code chunk number 13: disperseRmanual.Rnw:251-256
-###################################################
-## plot
-par(mfrow=c(2,1))
-plot(bellow$x, bellow$y, col=bellow$col)
-plot(rotatebellow$x, rotatebellow$y, col=rotatebellow$col)
-par(mfrow=c(1,1))
-
-
-###################################################
-### code chunk number 14: disperseRmanual.Rnw:261-266
-###################################################
-
-rainbowColors <- rainbow(max(bellow$subplot))
-palette(rainbowColors)
-plot(rotatebellow$x, rotatebellow$y, col=rotatebellow$subplot)
-
-
-
-###################################################
-### code chunk number 15: disperseRmanual.Rnw:272-300
-###################################################
-##get names of subplots
-plotnames <- unique(expandedTrees$plot)
-
-##quick function to calculate ranges of x's and y's
-getRange <- function(x){
-  store <- max(x) - min(x)
-  return(store)
-}
-
-## set up response table
-plotdimensions <- data.frame(
-  plot=plotnames,
-  xrange=0,
-  yrange=0,
-  stringsAsFactors=FALSE)
-
-##do loop through
-for(i in 1:length(plotnames)){
-  plotdimensions[i, "xrange"] <- getRange(
-    expandedTrees[expandedTrees$plot==plotnames[i],"x"])
-    plotdimensions[i, "yrange"] <- getRange(
-      expandedTrees[expandedTrees$plot==plotnames[i],"y"])
-}
-
-## view plot dimensions
-plotdimensions
-
 
 
 

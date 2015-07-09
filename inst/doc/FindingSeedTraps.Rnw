@@ -182,17 +182,22 @@ subplotsForTraps
 
 For ease, I've included TrapUTM in disperseR as is, and have not yet modified it, though I may do so later to clean up some of its function and make it a bit easier to read. The only thing I've changed is its name, to trapUTM, to match the style of other functions in the package. Ok, let's find our seed trap locations.
 
-<<fig=TRUE>>=
+<<>>=
 trapcoords <- trapUTM(
   filename="../data/BBBPIPO_subpolygon_corners.csv",
   subplots=subplotsForTraps,
   site="BBBPIPO",
   bearing=0,
   plotcorns=list(T,paste("../data/","BBBPIPO","_traps.png",sep="")))
+@
 
+
+
+<<fig=TRUE>>=
 plot(rotateBBB$x, rotateBBB$y, pch=".")
 points(trapcoords$XCoord, trapcoords$YCoord, col="red")
 @
+
 
 I'll be working to update this vignette and package until we can successfully do this with the other plots. I have not tested it with other plots, but I imagine it will work for the other plots as long as they're entered correctly and don't have anything different about subplot or seed trap locations. As an end note, you can access the most updated version of this vignette after installing through GitHub and loading this package by using the vignette("FindingSeedTraps") command; you can also list the vignettes for any attached package using vignette(all=FALSE).
 
