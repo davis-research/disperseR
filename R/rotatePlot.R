@@ -16,6 +16,8 @@
 #'   "bottomleft", "topright", and "plotcorner"; see Note for details.
 #' @param returntruesw If set to true, this function will return the "truesw"
 #'   points, converted to the new plot space, instead of the entire data.frame.
+#' @param manualconversion Defaults to 0; you can set this to a manual value to
+#'   add to the plot conversion, if there are issues with the default options.
 #'
 #' @return This function returns the data.frame from "x", with modified x and y
 #'   columns.
@@ -32,7 +34,7 @@
 #' @export
 
 
-rotatePlot <- function(df, origin=c(0,0), rnd=0, truesw=c(0,0), method="plotcorner", returntruesw=FALSE){
+rotatePlot <- function(df, origin=c(0,0), rnd=2, truesw=c(0,0), method="plotcorner", returntruesw=FALSE, manualconversion=0){
 
   if(!is.numeric(df$x) | !is.numeric(df$y)){
     stop("Sorry, x and y columns are not numeric or do not exist.")
@@ -52,7 +54,7 @@ if(method=="plotcorner"){
 
 
  polardf <- cart2polar(truesw[1], truesw[2], df$x, df$y)
- polardf$theta <- polardf$theta+conversion+90
+ polardf$theta <- polardf$theta+conversion+90+manualconversion
  newdf <- polar2cart(origin[1], origin[2], polardf$r, polardf$theta)
  returnedsw <- c(origin[1], origin[2])
 }
@@ -64,11 +66,11 @@ if(method=="bottomleft"){
                              bottommost[1, "x"],
                              bottommost[1, "y"])
   polardf <- cart2polar(leftmost[1, "x"], leftmost[1, "y"], df$x, df$y)
-  polardf$theta <- polardf$theta+conversion+90
+  polardf$theta <- polardf$theta+conversion+90+manualconversion
   newdf <- polar2cart(origin[1], origin[2], polardf$r, polardf$theta)
 
   tswdf <- cart2polar(leftmost[1, "x"], leftmost[1, "y"], truesw[1], truesw[2])
-  tswdf$theta <- tswdf$theta + conversion + 90
+  tswdf$theta <- tswdf$theta + conversion + 90 + manualconversion
   returnedsw <- polar2cart(origin[1], origin[2], tswdf$r, tswdf$theta)
 }
 
@@ -78,11 +80,11 @@ if(method=="topright"){
                                rightmost[1, "x"],
                                rightmost[1, "y"])
     polardf <- cart2polar(topmost[1, "x"], topmost[1, "y"], df$x, df$y)
-    polardf$theta <- polardf$theta+conversion+90
+    polardf$theta <- polardf$theta+conversion+90+manualconversion
     newdf <- polar2cart(origin[1], origin[2], polardf$r, polardf$theta)
 
     tswdf <- cart2polar(topmost[1, "x"], topmost[1, "y"], truesw[1], truesw[2])
-    tswdf$theta <- tswdf$theta + conversion + 90
+    tswdf$theta <- tswdf$theta + conversion + 90 + manualconversion
     returnedsw <- polar2cart(origin[1], origin[2], tswdf$r, tswdf$theta)
 }
 

@@ -46,7 +46,7 @@ findAdultTrees <- function(seedPlots, adults, m){
   ##numbers, not treeids, to associate with values. Also, we can get away with
   ##it because this function requires unique treeids.
   if(length(unique(adults$treeid)) != nrow(adults)){
-    stop("Error: You have repeated elements in your treeid column. Treeid must be a unique identifier.")
+    stop("Error: You have repeated elements in your treeid column. Treeid must be a unique identifier. Check to make sure that you're entering your data.frames into the function correctly.")
   }
 
 

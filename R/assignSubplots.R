@@ -48,8 +48,13 @@ assignSubplots <- function(df, subplotdf){
       #print(counts)
     } else{
       ## there's only one subplot, we're golden.
-      subplotdf[subplotdf$Subplot==subplots[i],"newsub"] <- unique(
-        reducedDf$subplot)
+      if(length(unique(reducedDf$subplot))==1){
+        subplotdf[subplotdf$Subplot==subplots[i],"newsub"] <- unique(
+          reducedDf$subplot)
+      } else{
+        subplotdf[subplotdf$Subplot==subplots[i],"newsub"] <- "X"
+      }
+
     }
   }
   subplotdf$Subplot <- subplotdf$newsub
