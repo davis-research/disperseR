@@ -9,7 +9,7 @@
 #'   \item{firstrec}{The first year that this tree was measured.}
 #'   \item{deathyear}{The year that this tree died.}
 #'   \item{x}{The tree's x coordinate.}
-#'   \item{y}{The treee's y coordinate.}
+#'   \item{y}{The tree's y coordinate.}
 #'   \item{measyear}{The year of measurement for this record. Trees may have multiple entries with different measuremeant years.}
 #'   \item{stage}{Whether the tree is a seedling (first year recorded) or tree (more than one record, or large enough when the plot was established).}
 #'   }

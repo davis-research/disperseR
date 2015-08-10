@@ -14,6 +14,7 @@
 #' @examples
 #'  countAdultsInRadius(c(1,2), data.frame(x=c(1:5), y=c(1:5)),6)
 #'
+#' @export
 
 countAdultsInRadius <- function(searchPoint, forest, m){
 

@@ -10,22 +10,22 @@
 #' @examples
 #' ## negative response
 #' sampleresponse <- data.frame(col1=NA, col2=NA)
-#' cleanResponse(sampleresponse)
+#' #cleanResponse(sampleresponse,1)
 #'
 #' ## positive response
 #' sampleresponse <- rbind(sampleresponse, c(1, 2), c(3, 4))
-#' cleanResponse(sampleresponse)
+#' cleanResponse(sampleresponse, 1)
 #' @export
 #'
 
 cleanResponse <- function(responsetable, rm.rows=0){
 
   if(nrow(responsetable) == 0){
-    responsetable <- "Sorry, nothing was found."
-  } else if(nrow(responsetable) == 1 & rm.rows != 0){
-    responsetable <- "Sorry, nothing was found."
+    stop("Sorry, nothing was found.")
+  } else if(nrow(responsetable) == 1 & rm.rows[1] != 0){
+    stop("Sorry, all rows were removed.")
   } else{
-    if(rm.rows != 0){
+    if(rm.rows[1] != 0){
       responsetable <- responsetable[-rm.rows,]
     }
       rownames(responsetable) <- 1:nrow(responsetable)

@@ -19,10 +19,10 @@ tells you that the response was empty to begin with.
 \examples{
 ## negative response
 sampleresponse <- data.frame(col1=NA, col2=NA)
-cleanResponse(sampleresponse)
+#cleanResponse(sampleresponse,1)
 
 ## positive response
 sampleresponse <- rbind(sampleresponse, c(1, 2), c(3, 4))
-cleanResponse(sampleresponse)
+cleanResponse(sampleresponse, 1)
 }
 

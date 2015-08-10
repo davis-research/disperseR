@@ -4,8 +4,8 @@
 \alias{rotatePlot}
 \title{Rotate Plot To NSEW Orientation}
 \usage{
-rotatePlot(df, origin = c(0, 0), rnd = 0, truesw = c(0, 0),
-  method = "plotcorner", returntruesw = FALSE)
+rotatePlot(df, origin = c(0, 0), rnd = 2, truesw = c(0, 0),
+  method = "plotcorner", returntruesw = FALSE, manualconversion = 0)
 }
 \arguments{
 \item{df}{A data.frame containing an "x" and a "y" column, representing
@@ -25,7 +25,10 @@ out than any of the trees.}
 "bottomleft", "topright", and "plotcorner"; see Note for details.}
 
 \item{returntruesw}{If set to true, this function will return the "truesw"
-  points, converted to the new plot space, instead of the entire data.frame.}
+points, converted to the new plot space, instead of the entire data.frame.}
+
+\item{manualconversion}{Defaults to 0; you can set this to a manual value to
+  add to the plot conversion, if there are issues with the default options.}
 }
 \value{
 This function returns the data.frame from "x", with modified x and y
